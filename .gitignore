@@ -1,12 +1,28 @@
-*.class
+.idea*
+**/.DS_Store
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+.gradle
 
-# Package Files #
-*.jar
-*.war
-*.ear
+*/out
+*/build
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+out/*
+build/*
+
+*.iml
+*.ipr
+*.iws
+
+**/.gradletasknamecache
+
+stdout.txt
+stderr.txt
+
+deploy/config.yaml
+deploy/openregister-java.jar
+deployable_bundle
+
+.venv
+.cache
+
+.sass-cache

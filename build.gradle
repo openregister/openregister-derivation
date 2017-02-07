@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply from: 'external-dependencies.gradle'
+group 'openregister'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile googleGuice
+
+    testCompile junit, mockito
+}
+
+task(run, type: JavaExec, dependsOn: ['classes']) {
+    main = 'uk.gov.derivation.Main'
+    classpath = sourceSets.main.runtimeClasspath
+    args = []
+    jvmArgs = []
+}
