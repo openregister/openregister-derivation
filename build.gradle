@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    compile googleGuice
+    compile googleGuice, jackson, commons
 
     testCompile junit, mockito
 }
