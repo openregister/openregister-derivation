@@ -1,4 +1,4 @@
-package uk.gov.derivation;
+package uk.gov.register.derivation;
 
 import com.google.inject.AbstractModule;
 

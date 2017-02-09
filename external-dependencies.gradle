@@ -1,5 +1,8 @@
 ext {
     googleGuice = 'com.google.inject:guice:4.1.0'
+    jackson =  'com.fasterxml.jackson.core:jackson-databind:2.8.6'
+    commonsCodec = 'commons-codec:commons-codec:1.10'
+
 
     // test dependencies
     junit = ['junit:junit:4.12','org.hamcrest:hamcrest-library:1.3']
