@@ -7,9 +7,9 @@ repositories {
 }
 
 dependencies {
-    compile googleGuice, commonsCodec, jackson
+    compile googleGuice, commonsCodec, jackson, awsS3
 
-    testCompile junit, mockito
+    testCompile junit, mockito, jsonAssert
 }
 
 task(run, type: JavaExec, dependsOn: ['classes']) {

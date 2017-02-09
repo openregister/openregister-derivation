@@ -1,6 +1,12 @@
 package uk.gov.register.derivation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 public class Entry {
 
@@ -18,8 +24,14 @@ public class Entry {
         this.sequenceNumber = sequenceNumber;
     }
 
+    @JsonIgnore
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    @JsonProperty("timestamp")
+    public String getTimestampAsString() {
+        return ISO_INSTANT.format(timestamp.truncatedTo(ChronoUnit.SECONDS));
     }
 
     public String getItemHash() {
