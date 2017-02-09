@@ -1,5 +1,8 @@
 package uk.gov.register.derivation;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.time.Instant;
 import java.util.*;
@@ -15,7 +18,10 @@ public class RsfParser {
 
     private final static String ADD_ITEM = "add-item";
     private final static String APPEND_ENTRY = "append-entry";
-    private final String ASSERT_ROOT_HASH = "assert-root-hash";
+    private final static String ASSERT_ROOT_HASH = "assert-root-hash";
+
+    private static ObjectMapper MAPPER = new ObjectMapper();
+    private static TypeReference<HashMap<String,Object>> TYPEREF = new TypeReference<HashMap<String,Object>>() {};
 
     public Set<PartialEntity> parse(InputStream rsfStream) {
         final Map<String, Item> itemsByHash = new HashMap<>();
@@ -58,7 +64,8 @@ public class RsfParser {
 
         try {
             if (ADD_ITEM.equals(commandName) && parts.size() == 2) {
-                Item item = new Item(parts.get(1));
+                Map<String,Object>  fields = MAPPER.readValue(parts.get(1), TYPEREF);
+                Item item = new Item(fields);
                 String itemHash = "sha-256:" + sha256Hex(parts.get(1));
                 itemsByHash.put(itemHash, item);
             } else if (APPEND_ENTRY.equals(commandName) && parts.size() == 4) {
