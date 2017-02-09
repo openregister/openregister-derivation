@@ -1,9 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
 apply plugin: 'java'
 apply from: 'external-dependencies.gradle'
 group 'openregister'
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'uk.gov.register.derivation.Main'
+    }
 }
 
 dependencies {

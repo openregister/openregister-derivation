@@ -11,14 +11,18 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Injector injector = Guice.createInjector(new Registrar());
+        if (args.length == 3) {
+            Injector injector = Guice.createInjector(new Registrar());
 
-        InputStream rsfStream = Files.newInputStream(Paths.get( args[0]));
-        RsfParser parser = injector.getInstance(RsfParser.class);
-        Set<PartialEntity> entities = parser.parse(rsfStream);
+            InputStream rsfStream = Files.newInputStream(Paths.get(args[0]));
+            RsfParser parser = injector.getInstance(RsfParser.class);
+            Set<PartialEntity> entities = parser.parse(rsfStream);
 
-        String jsonResult = JsonSerializer.serialize(entities);
-        Uploader uploader = injector.getInstance(Uploader.class);
-        uploader.upload("openregister.derivation", "derivation.json", jsonResult);
+            String jsonResult = JsonSerializer.serialize(entities);
+            Uploader uploader = injector.getInstance(Uploader.class);
+            uploader.upload(args[1], args[2], jsonResult);
+        } else {
+            System.err.println("Usage: args required - [rsf file path] [s3 bucket] [s3 key]");
+        }
     }
 }
