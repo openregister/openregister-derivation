@@ -34,7 +34,7 @@ public class RsfParser {
             List<Entry> entries = kv.getValue().stream().map(entry -> {
                 String itemHash = entry.getItemHash();
                 if (!itemsByHash.containsKey(itemHash)) {
-                    throw new SerializedRegisterParseException("xxx");
+                    throw new SerializedRegisterParseException("failed to find item matching hash: " + itemHash);
                 }
                 entry.setItem(itemsByHash.get(itemHash));
                 return entry;
@@ -62,13 +62,15 @@ public class RsfParser {
                 String itemHash = "sha-256:" + sha256Hex(parts.get(1));
                 itemsByHash.put(itemHash, item);
             } else if (APPEND_ENTRY.equals(commandName) && parts.size() == 4) {
-                Entry entry = new Entry(entryNumber.getAndIncrement(), parseTimestamp(parts.get(1)), parts.get(2));
+                Entry entry = new Entry(entryNumber.getAndIncrement(), Instant.parse(parts.get(1)), parts.get(2));
                 if (!entriesByKey.containsKey(parts.get(3))) {
                     entriesByKey.put(parts.get(3), new LinkedList<>());
                 }
                 entriesByKey.get(parts.get(3)).add(entry);
 
             } else if (ASSERT_ROOT_HASH.equals(commandName)) {
+                // TODO
+                // do nothing for now
                 ;
             } else {
                 throw new SerializedRegisterParseException("failed to parse line " + line);
@@ -81,11 +83,6 @@ public class RsfParser {
     private int startingEntryNumber() {
         // TODO
         return 1;
-    }
-
-    private Instant parseTimestamp(String s) {
-        // TODO
-        return Instant.now();
     }
 
 }
