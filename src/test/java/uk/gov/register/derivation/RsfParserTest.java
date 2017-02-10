@@ -6,8 +6,6 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,7 +13,8 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class RsfParserTest {
 
@@ -68,7 +67,7 @@ public class RsfParserTest {
     public void shouldFailIfItemsAndEntriesDoNotMatch() throws Exception {
         InputStream rdfStream = Files.newInputStream(Paths.get("src/test/resources", "bad-countries.rsf"));
         try {
-            Set<PartialEntity> entities = parser.parse(rdfStream);
+            parser.parse(rdfStream);
         } catch (SerializedRegisterParseException e){
             assertThat(e.getMessage(), is("failed to find item matching hash: sha-256:c69c04fff98c59aabd739d43018e87a25fd51a00c37d100721cc68fa9003a720-I-am-wrong"));
         }
@@ -78,7 +77,7 @@ public class RsfParserTest {
     public void shouldFailIfInvalidRsf() throws Exception {
         InputStream rdfStream = Files.newInputStream(Paths.get("src/test/resources", "invalid.rsf"));
         try {
-            Set<PartialEntity> entities = parser.parse(rdfStream);
+            parser.parse(rdfStream);
         } catch (SerializedRegisterParseException e){
             assertThat(e.getMessage(), is("failed to parse line append-entry\t2016-04-05T13:23:05Z\tsha-256:d97d6b34bc572e334cbd7898f785b72947557d9dbea59977077f231274259f3b"));
         }
