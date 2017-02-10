@@ -1,37 +1,10 @@
-buildscript {
+allprojects {
+    group 'openregister'
     repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        mavenCentral()
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
 
-apply plugin: 'java'
-apply from: 'external-dependencies.gradle'
-group 'openregister'
 
-repositories {
-    mavenCentral()
-}
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'uk.gov.register.derivation.Main'
-    }
-}
-
-dependencies {
-    compile googleGuice, commonsCodec, jackson, awsS3
-
-    testCompile junit, mockito, jsonAssert
-}
-
-task(run, type: JavaExec, dependsOn: ['classes']) {
-    main = 'uk.gov.derivation.Main'
-    classpath = sourceSets.main.runtimeClasspath
-    args = []
-    jvmArgs = []
-}
