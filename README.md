@@ -14,7 +14,7 @@ Currently a Java command line application which reads an RSF file and stores a J
 
 # Usage 
 
-The applcation requires 3 arguments:
+The command line application requires 3 arguments:
 
 - path to RSF file
 - s3 bucket
@@ -22,7 +22,8 @@ The applcation requires 3 arguments:
 
 For example:
 
-    gradle shadowJar
-    cd build
-    java -jar openregister-derivation-all.jar /tmp/countries.rsf openregister.derivation derivation.json
+	cd [project root]
+    gradle derivation-cli:shadowJar
+    cd derivation-cli/build/libs
+    java -jar derivation-cli-all.jar /tmp/countries.rsf openregister.derivation derivation.json
 

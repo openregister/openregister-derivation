@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'uk.gov.register.derivation.cli.Main'
+    }
+}
+
+dependencies {
+    compile project(':derivation-core')
+    compile 'com.google.inject:guice:4.1.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
+    compile 'com.amazonaws:aws-java-sdk-s3:1.11.77'
+
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+}
