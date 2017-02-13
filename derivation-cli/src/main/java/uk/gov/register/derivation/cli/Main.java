@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.core.RsfParser;
+import uk.gov.register.derivation.currentcountries.CurrentCountryFilter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ public class Main {
             RsfParser parser = injector.getInstance(RsfParser.class);
             Set<PartialEntity> entities = parser.parse(rsfStream);
 
-            RegisterTransformer transformer = injector.getInstance(RegisterTransformer.class);
+            CurrentCountryFilter transformer = injector.getInstance(CurrentCountryFilter.class);
             Set<PartialEntity> transformed = transformer.transform(entities);
 
             String jsonResult = JsonSerializer.serialize(transformed);
