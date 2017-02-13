@@ -29,4 +29,8 @@ public class PartialEntity {
                 ", entries=" + entries +
                 '}';
     }
+
+    public void merge(List<Entry> newEntries) {
+        entries.addAll(newEntries);
+    }
 }

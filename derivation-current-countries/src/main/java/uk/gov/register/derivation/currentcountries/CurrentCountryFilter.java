@@ -11,9 +11,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoField.*;
@@ -38,6 +42,22 @@ public class CurrentCountryFilter implements RegisterTransformer {
         return entities.stream().filter(e -> !endsBefore(e, now)).collect(toSet());
     }
 
+    public Set<PartialEntity> partialTransform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
+        Map<String, PartialEntity> stateMap = state.stream().collect(Collectors.toMap(PartialEntity::getKey, Function.identity()));
+        newPartialEntities.forEach(newEntity -> {
+            if (endsBefore(newEntity, Instant.now())) {
+                stateMap.remove(newEntity.getKey());
+            }
+            else if (stateMap.containsKey(newEntity.getKey())) {
+                stateMap.get(newEntity.getKey()).merge(newEntity.getEntries());
+            }
+            else {
+                stateMap.put(newEntity.getKey(), newEntity);
+            }
+        });
+        return new HashSet<>(stateMap.values());
+    }
+
     private boolean endsBefore(PartialEntity entity, final Instant time) {
         List<Entry> entries = entity.getEntries();
         Entry current = entries.get(entries.size() - 1);
@@ -59,5 +79,4 @@ public class CurrentCountryFilter implements RegisterTransformer {
             throw new DateTimeParseException("Failed to parse date", date, 0);
         }
     }
-
 }

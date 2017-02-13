@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
@@ -82,6 +83,54 @@ public class CurrentCountryFilterTest {
         PartialEntity foundEntity = transformedEntities.iterator().next();
         assertThat(foundEntity.getKey(), is("DE"));
         assertThat(foundEntity.getEntries().size(), is(2));
+    }
+
+    @Test
+    public void shouldExpireCountry() {
+        PartialEntity ussrCreate = partialEntity("USSR", entry(1, OCT_1990, currentItem()));
+        Set<PartialEntity> transformedEntities = filter.partialTransform(singleton(ussrCreate), new HashSet<>());
+        assertThat(transformedEntities.size(), is(1));
+
+        PartialEntity ussrExpire = partialEntity("USSR", entry(2, DEC_1991, expiredItem()));
+        Set<PartialEntity> transformedEntities2 = filter.partialTransform(singleton(ussrExpire), transformedEntities);
+
+        assertThat(transformedEntities2.size(), is(0));
+    }
+
+    @Test
+    public void shouldAddFurtherEntriesToCountry() {
+        PartialEntity deCreate = partialEntity("DE", entry(1, OCT_1990, currentItem()));
+        Set<PartialEntity> transformedEntities = filter.partialTransform(singleton(deCreate), new HashSet<>());
+        assertThat(transformedEntities.size(), is(1));
+        assertThat(transformedEntities.iterator().next().getEntries().size(), is(1));
+
+        PartialEntity deUpdate = partialEntity("DE", entry(2, DEC_1991, currentItem()));
+        Set<PartialEntity> transformedEntities2 = filter.partialTransform(singleton(deUpdate), transformedEntities);
+
+        assertThat(transformedEntities2.size(), is(1));
+        assertThat(transformedEntities2.iterator().next().getEntries().size(), is(2));
+    }
+
+    private Item expiredItem() {
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("end-date", "1991-08");
+        return new Item(fields);
+    }
+
+    private Item currentItem() {
+        return new Item(new HashMap<>());
+    }
+
+    private Entry entry(int sequenceNumber, Instant oct1990, Item item) {
+        Entry ussrCreateEntry = new Entry(sequenceNumber, oct1990, "foobar");
+        ussrCreateEntry.setItem(item);
+        return ussrCreateEntry;
+    }
+
+    private PartialEntity partialEntity(String ussr, Entry ussrCreateEntry) {
+        PartialEntity ussrCreatePartial = new PartialEntity(ussr);
+        ussrCreatePartial.getEntries().add(ussrCreateEntry);
+        return ussrCreatePartial;
     }
 
     @Test
