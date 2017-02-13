@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -64,7 +65,7 @@ public class CurrentCountryFilterTest {
         germanOldFields.put("end-date", "1990-10-02T00:01:00.00Z");
         sovietFields.put("end-date", "1991-12-25T00:01:00.00Z");
 
-        Set<PartialEntity> transformedEntities = filter.transform(entities);
+        Set<PartialEntity> transformedEntities = filter.transform(entities, Collections.emptySet());
 
         assertThat(transformedEntities.size(), is(1));
         PartialEntity foundEntity = transformedEntities.iterator().next();
@@ -77,7 +78,7 @@ public class CurrentCountryFilterTest {
         germanOldFields.put("end-date", "1990-10-02");
         sovietFields.put("end-date", "1991-12-25");
 
-        Set<PartialEntity> transformedEntities = filter.transform(entities);
+        Set<PartialEntity> transformedEntities = filter.transform(entities, Collections.emptySet());
 
         assertThat(transformedEntities.size(), is(1));
         PartialEntity foundEntity = transformedEntities.iterator().next();
@@ -88,11 +89,11 @@ public class CurrentCountryFilterTest {
     @Test
     public void shouldExpireCountry() {
         PartialEntity ussrCreate = partialEntity("USSR", entry(1, OCT_1990, currentItem()));
-        Set<PartialEntity> transformedEntities = filter.partialTransform(singleton(ussrCreate), new HashSet<>());
+        Set<PartialEntity> transformedEntities = filter.transform(singleton(ussrCreate), new HashSet<>());
         assertThat(transformedEntities.size(), is(1));
 
         PartialEntity ussrExpire = partialEntity("USSR", entry(2, DEC_1991, expiredItem()));
-        Set<PartialEntity> transformedEntities2 = filter.partialTransform(singleton(ussrExpire), transformedEntities);
+        Set<PartialEntity> transformedEntities2 = filter.transform(singleton(ussrExpire), transformedEntities);
 
         assertThat(transformedEntities2.size(), is(0));
     }
@@ -100,12 +101,12 @@ public class CurrentCountryFilterTest {
     @Test
     public void shouldAddFurtherEntriesToCountry() {
         PartialEntity deCreate = partialEntity("DE", entry(1, OCT_1990, currentItem()));
-        Set<PartialEntity> transformedEntities = filter.partialTransform(singleton(deCreate), new HashSet<>());
+        Set<PartialEntity> transformedEntities = filter.transform(singleton(deCreate), new HashSet<>());
         assertThat(transformedEntities.size(), is(1));
         assertThat(transformedEntities.iterator().next().getEntries().size(), is(1));
 
         PartialEntity deUpdate = partialEntity("DE", entry(2, DEC_1991, currentItem()));
-        Set<PartialEntity> transformedEntities2 = filter.partialTransform(singleton(deUpdate), transformedEntities);
+        Set<PartialEntity> transformedEntities2 = filter.transform(singleton(deUpdate), transformedEntities);
 
         assertThat(transformedEntities2.size(), is(1));
         assertThat(transformedEntities2.iterator().next().getEntries().size(), is(2));
@@ -138,7 +139,7 @@ public class CurrentCountryFilterTest {
         germanOldFields.put("end-date", "1990-10");
         sovietFields.put("end-date", "1991-12");
 
-        Set<PartialEntity> transformedEntities = filter.transform(entities);
+        Set<PartialEntity> transformedEntities = filter.transform(entities, Collections.emptySet());
 
         assertThat(transformedEntities.size(), is(1));
         PartialEntity foundEntity = transformedEntities.iterator().next();
@@ -151,6 +152,6 @@ public class CurrentCountryFilterTest {
         germanOldFields.put("end-date", "1990.1.3");
         sovietFields.put("end-date", "1991.3.abc");
 
-        filter.transform(entities);
+        filter.transform(entities, emptySet());
     }
 }

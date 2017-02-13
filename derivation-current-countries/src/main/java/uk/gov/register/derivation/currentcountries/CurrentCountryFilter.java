@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoField.*;
-import static java.util.stream.Collectors.toSet;
 
 public class CurrentCountryFilter implements RegisterTransformer {
 
@@ -37,12 +36,7 @@ public class CurrentCountryFilter implements RegisterTransformer {
     }
 
     @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> entities) {
-        final Instant now = Instant.now();
-        return entities.stream().filter(e -> !endsBefore(e, now)).collect(toSet());
-    }
-
-    public Set<PartialEntity> partialTransform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
         Map<String, PartialEntity> stateMap = state.stream().collect(Collectors.toMap(PartialEntity::getKey, Function.identity()));
         newPartialEntities.forEach(newEntity -> {
             if (endsBefore(newEntity, Instant.now())) {
