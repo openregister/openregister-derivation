@@ -17,6 +17,7 @@ jar {
 }
 
 dependencies {
+    compile project(':derivation-current-countries')
     compile project(':derivation-core')
     compile 'com.google.inject:guice:4.1.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'

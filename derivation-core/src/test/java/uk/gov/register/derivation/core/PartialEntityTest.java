@@ -1,5 +1,7 @@
 package uk.gov.register.derivation.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -10,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RsfSerializerTest {
+public class PartialEntityTest {
     @Test
     public void shouldSerializePartialEntitiesAsJson() throws IOException, JSONException {
         PartialEntity entity = new PartialEntity("CZ");
@@ -29,7 +31,9 @@ public class RsfSerializerTest {
         entry2.setItem(new Item(fields2));
         entity.getEntries().addAll(Arrays.asList(entry1, entry2));
 
-        String result = JsonSerializer.serialize(entity);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String result = objectMapper.writeValueAsString(entity);
 
         String expectedJson = "{" +
                 "  \"key\": \"CZ\"," +
