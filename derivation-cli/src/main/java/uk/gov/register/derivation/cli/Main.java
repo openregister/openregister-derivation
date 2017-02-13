@@ -1,5 +1,7 @@
 package uk.gov.register.derivation.cli;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
@@ -16,18 +18,28 @@ import java.util.Set;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length == 3) {
+            String bucketName = args[1];
+            String objectName = args[2];
             Injector injector = Guice.createInjector(new DerivationCliModule());
 
             InputStream rsfStream = Files.newInputStream(Paths.get(args[0]));
             RsfParser parser = injector.getInstance(RsfParser.class);
             Set<PartialEntity> entities = parser.parse(rsfStream);
 
+            Set<PartialEntity> partialEntities = Collections.emptySet();
+            AmazonS3 amazonS3 = injector.getInstance(AmazonS3.class);
+            if (amazonS3.doesObjectExist(bucketName, objectName)) {
+                InputStream objectContent = amazonS3.getObject(bucketName, objectName).getObjectContent();
+                partialEntities = JsonSerializer.deserialize(objectContent, new TypeReference<Set<PartialEntity>>() {});
+            }
+            amazonS3.getObject(bucketName, objectName);
+
             CurrentCountryFilter transformer = injector.getInstance(CurrentCountryFilter.class);
-            Set<PartialEntity> transformed = transformer.transform(entities, Collections.emptySet());
+            Set<PartialEntity> transformed = transformer.transform(entities, partialEntities);
 
             String jsonResult = JsonSerializer.serialize(transformed);
             Uploader uploader = injector.getInstance(Uploader.class);
-            uploader.upload(args[1], args[2], jsonResult);
+            uploader.upload(bucketName, objectName, jsonResult);
         } else {
             System.err.println("Usage: args required - [rsf file path] [s3 bucket] [s3 key]");
         }
