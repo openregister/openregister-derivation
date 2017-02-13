@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':derivation-core')
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

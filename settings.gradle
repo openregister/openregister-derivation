@@ -1,4 +1,5 @@
 rootProject.name = 'openregister-derivation'
 include 'derivation-core'
 include 'derivation-cli'
+include 'derivation-current-countries'
 
