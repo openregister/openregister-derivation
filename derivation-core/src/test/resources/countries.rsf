@@ -1,8 +1,2 @@
 add-item	{"citizen-names":"Czech","country":"CZ","name":"Czech Republic","official-name":"The Czech Republic","start-date":"1993-01-01"}
-add-item	{"citizen-names":"Citizen of Lesotho","country":"LS","name":"Lesotho","official-name":"The Kingdom of Lesotho"}
-add-item	{"citizen-names":"Vatican citizen","country":"VA","name":"Vatican City","official-name":"The Vatican City"}
-add-item	{"citizen-names":"Czech","country":"CZ","name":"Czechia","official-name":"The Czech Republic","start-date":"1993-01-01"}
 append-entry	2016-04-05T13:23:05Z	sha-256:c45bd0b4785680534e07c627a5eea0d2f065f0a4184a02ba2c1e643672c3f2ed	CZ
-append-entry	2016-04-05T13:23:05Z	sha-256:7c0ff61a59fd3997ba2c9fb12565cf00d75ba8eccdf863aa76f092a244f9e2c7	LS
-append-entry	2016-04-05T13:23:05Z	sha-256:d97d6b34bc572e334cbd7898f785b72947557d9dbea59977077f231274259f3b	VA
-append-entry	2016-11-11T16:25:07Z	sha-256:c69c04fff98c59aabd739d43018e87a25fd51a00c37d100721cc68fa9003a720	CZ

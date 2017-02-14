@@ -1,8 +1,8 @@
 package uk.gov.register.derivation.core;
 
-import java.util.Set;
+import java.util.Optional;
 
 public interface RegisterTransformer {
 
-    Set<PartialEntity> transform(Set<PartialEntity> entities);
+    Optional<Entry> transform(Entry entry);
 }
