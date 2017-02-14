@@ -9,7 +9,6 @@ import uk.gov.register.derivation.currentcountries.CurrentCountryFilter;
 public class DerivationCliModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(RegisterTransformer.class).to(CurrentCountryFilter.class);
         bind(AmazonS3.class).to(AmazonS3Client.class);
     }
 }

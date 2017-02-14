@@ -11,13 +11,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
+import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoField.*;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toMap;
 
 public class CurrentCountryFilter implements RegisterTransformer {
 
@@ -33,9 +33,21 @@ public class CurrentCountryFilter implements RegisterTransformer {
     }
 
     @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> entities) {
-        final Instant now = Instant.now();
-        return entities.stream().filter(e -> !endsBefore(e, now)).collect(toSet());
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
+        final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, Function.identity()));
+        newPartialEntities.forEach(newEntity -> {
+            String countryCode = newEntity.getKey();
+            if (endsBefore(newEntity, now())) {
+                stateMap.remove(countryCode);
+            }
+            else if (stateMap.containsKey(countryCode)) {
+                stateMap.get(countryCode).getEntries().addAll(newEntity.getEntries());
+            }
+            else {
+                stateMap.put(countryCode, newEntity);
+            }
+        });
+        return new HashSet<>(stateMap.values());
     }
 
     private boolean endsBefore(PartialEntity entity, final Instant time) {
@@ -46,7 +58,6 @@ public class CurrentCountryFilter implements RegisterTransformer {
     }
 
     private Instant parseDate(String date) {
-
         TemporalAccessor temporalAccessor = dateTimeFormatter.parse(date);
 
         if (temporalAccessor.isSupported(INSTANT_SECONDS)) {
@@ -59,5 +70,4 @@ public class CurrentCountryFilter implements RegisterTransformer {
             throw new DateTimeParseException("Failed to parse date", date, 0);
         }
     }
-
 }
