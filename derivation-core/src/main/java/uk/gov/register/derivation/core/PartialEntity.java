@@ -1,5 +1,7 @@
 package uk.gov.register.derivation.core;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ public class PartialEntity {
 
     private final List<Entry> entries;
 
-    public PartialEntity(String key) {
+    public PartialEntity(@JsonProperty("key") String key) {
         this.key = key;
         this.entries = new LinkedList<>();
     }
@@ -30,7 +32,4 @@ public class PartialEntity {
                 '}';
     }
 
-    public void merge(List<Entry> newEntries) {
-        entries.addAll(newEntries);
-    }
 }

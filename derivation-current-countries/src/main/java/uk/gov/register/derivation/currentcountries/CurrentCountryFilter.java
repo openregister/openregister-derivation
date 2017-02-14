@@ -11,16 +11,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoField.*;
+import static java.util.stream.Collectors.toMap;
 
 public class CurrentCountryFilter implements RegisterTransformer {
 
@@ -37,16 +34,17 @@ public class CurrentCountryFilter implements RegisterTransformer {
 
     @Override
     public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
-        Map<String, PartialEntity> stateMap = state.stream().collect(Collectors.toMap(PartialEntity::getKey, Function.identity()));
+        final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, Function.identity()));
         newPartialEntities.forEach(newEntity -> {
-            if (endsBefore(newEntity, Instant.now())) {
-                stateMap.remove(newEntity.getKey());
+            String countryCode = newEntity.getKey();
+            if (endsBefore(newEntity, now())) {
+                stateMap.remove(countryCode);
             }
-            else if (stateMap.containsKey(newEntity.getKey())) {
-                stateMap.get(newEntity.getKey()).merge(newEntity.getEntries());
+            else if (stateMap.containsKey(countryCode)) {
+                stateMap.get(countryCode).getEntries().addAll(newEntity.getEntries());
             }
             else {
-                stateMap.put(newEntity.getKey(), newEntity);
+                stateMap.put(countryCode, newEntity);
             }
         });
         return new HashSet<>(stateMap.values());
@@ -60,7 +58,6 @@ public class CurrentCountryFilter implements RegisterTransformer {
     }
 
     private Instant parseDate(String date) {
-
         TemporalAccessor temporalAccessor = dateTimeFormatter.parse(date);
 
         if (temporalAccessor.isSupported(INSTANT_SECONDS)) {

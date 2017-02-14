@@ -32,14 +32,12 @@ public class Main {
                 InputStream objectContent = amazonS3.getObject(bucketName, objectName).getObjectContent();
                 partialEntities = JsonSerializer.deserialize(objectContent, new TypeReference<Set<PartialEntity>>() {});
             }
-            amazonS3.getObject(bucketName, objectName);
 
             CurrentCountryFilter transformer = injector.getInstance(CurrentCountryFilter.class);
             Set<PartialEntity> transformed = transformer.transform(entities, partialEntities);
 
             String jsonResult = JsonSerializer.serialize(transformed);
-            Uploader uploader = injector.getInstance(Uploader.class);
-            uploader.upload(bucketName, objectName, jsonResult);
+            amazonS3.putObject(bucketName, objectName, jsonResult);
         } else {
             System.err.println("Usage: args required - [rsf file path] [s3 bucket] [s3 key]");
         }

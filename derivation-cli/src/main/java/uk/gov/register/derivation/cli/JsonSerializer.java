@@ -13,6 +13,7 @@ public class JsonSerializer {
     public static String serialize(Object data) throws JsonProcessingException {
         return objectMapper.writeValueAsString(data);
     }
+
     public static <T> T deserialize(InputStream data, TypeReference<T> type) throws IOException {
         return objectMapper.readValue(data, type);
     }

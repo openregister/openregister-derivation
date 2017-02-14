@@ -24,6 +24,14 @@ public class Entry {
         this.sequenceNumber = sequenceNumber;
     }
 
+    // used by Jackson
+    public Entry(@JsonProperty("sequenceNumber") int sequenceNumber, @JsonProperty("timestamp") String timestamp,
+                 @JsonProperty("itemHash") String itemHash) {
+        this.timestamp = Instant.parse(timestamp);
+        this.itemHash = itemHash;
+        this.sequenceNumber = sequenceNumber;
+    }
+
     @JsonIgnore
     public Instant getTimestamp() {
         return timestamp;
