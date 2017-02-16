@@ -24,6 +24,10 @@ public class PartialEntity {
         return entries;
     }
 
+    public Entry getRecord() {
+        return entries.get(entries.size() - 1);
+    }
+
     @Override
     public String toString() {
         return "PartialEntity{" +
