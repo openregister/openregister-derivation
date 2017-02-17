@@ -1,5 +1,6 @@
 package uk.gov.register.derivation.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedList;
@@ -24,8 +25,13 @@ public class PartialEntity {
         return entries;
     }
 
+    @JsonIgnore
     public Entry getRecord() {
-        return entries.get(entries.size() - 1);
+        if (entries.size() > 0) {
+            return entries.get(entries.size() - 1);
+        } else {
+            return null;
+        }
     }
 
     @Override

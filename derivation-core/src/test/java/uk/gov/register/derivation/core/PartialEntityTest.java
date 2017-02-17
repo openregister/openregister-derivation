@@ -40,7 +40,7 @@ public class PartialEntityTest {
                 "  \"entries\": [" +
                 "    {" +
                 "      \"itemHash\": \"sha-256:1\"," +
-                "      \"sequenceNumber\": 1," +
+                "      \"entryNumber\": 1," +
                 "      \"item\": {" +
                 "        \"fields\": {" +
                 "          \"country\": \"CZ\"," +
@@ -51,7 +51,7 @@ public class PartialEntityTest {
                 "    }," +
                 "    {" +
                 "      \"itemHash\": \"sha-256:2\"," +
-                "      \"sequenceNumber\": 2," +
+                "      \"entryNumber\": 2," +
                 "      \"item\": {" +
                 "        \"fields\": {" +
                 "          \"country\": \"CZ\"," +
