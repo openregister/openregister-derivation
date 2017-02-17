@@ -6,7 +6,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.core.RsfParser;
-import uk.gov.register.derivation.currentcountries.CurrentCountryFilter;
+import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ public class Main {
                 partialEntities = JsonSerializer.deserialize(objectContent, new TypeReference<Set<PartialEntity>>() {});
             }
 
-            CurrentCountryFilter transformer = injector.getInstance(CurrentCountryFilter.class);
+            LocalAuthorityByTypeTransformer transformer = injector.getInstance(LocalAuthorityByTypeTransformer.class);
             Set<PartialEntity> transformed = transformer.transform(entities, partialEntities);
 
             String jsonResult = JsonSerializer.serialize(transformed);
