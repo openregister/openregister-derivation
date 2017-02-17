@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class PartialEntity {
 
@@ -26,11 +27,11 @@ public class PartialEntity {
     }
 
     @JsonIgnore
-    public Entry getRecord() {
+    public Optional<Entry> getRecord() {
         if (entries.size() > 0) {
-            return entries.get(entries.size() - 1);
+            return Optional.of(entries.get(entries.size() - 1));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
