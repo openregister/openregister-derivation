@@ -27,7 +27,11 @@ public class PartialEntity {
 
     @JsonIgnore
     public Entry getRecord() {
-        return entries.get(entries.size() - 1);
+        if (entries.size() > 0) {
+            return entries.get(entries.size() - 1);
+        } else {
+            return null;
+        }
     }
 
     @Override

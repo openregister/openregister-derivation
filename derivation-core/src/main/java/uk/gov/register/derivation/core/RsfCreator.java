@@ -14,7 +14,7 @@ public class RsfCreator {
 
     public String serializeAsRsf(Set<PartialEntity> entities) {
         return entities.stream().flatMap(pe -> getWrappedEntryStream(pe))
-                .sorted((e1, e2) -> Integer.compare(e1.entry.getSequenceNumber(), e2.entry.getSequenceNumber()))
+                .sorted((e1, e2) -> Integer.compare(e1.entry.getEntryNumber(), e2.entry.getEntryNumber()))
                 .map(e -> serializeItem(e.entry.getItem()) + "\n" + serializeEntry(e))
                 .collect(Collectors.joining("\n"));
     }
