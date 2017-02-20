@@ -1,10 +1,9 @@
 package uk.gov.register.derivation.cli;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
+import uk.gov.register.derivation.core.RsfCreator;
 import uk.gov.register.derivation.core.RsfParser;
 import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 
@@ -16,30 +15,36 @@ import java.util.Collections;
 import java.util.Set;
 
 public class Main {
+
     public static void main(String[] args) throws IOException {
-        if (args.length == 3) {
-            String bucketName = args[1];
-            String objectName = args[2];
+        if (args.length > 0) {
+            String updateFile = args[0];
+
             Injector injector = Guice.createInjector(new DerivationCliModule());
 
-            InputStream rsfStream = Files.newInputStream(Paths.get(args[0]));
             RsfParser parser = injector.getInstance(RsfParser.class);
-            Set<PartialEntity> entities = parser.parse(rsfStream);
+            LocalAuthorityByTypeTransformer transformer = injector.getInstance(LocalAuthorityByTypeTransformer.class);
+            RsfCreator rsfCreator = injector.getInstance(RsfCreator.class);
 
-            Set<PartialEntity> partialEntities = Collections.emptySet();
-            AmazonS3 amazonS3 = injector.getInstance(AmazonS3.class);
-            if (amazonS3.doesObjectExist(bucketName, objectName)) {
-                InputStream objectContent = amazonS3.getObject(bucketName, objectName).getObjectContent();
-                partialEntities = JsonSerializer.deserialize(objectContent, new TypeReference<Set<PartialEntity>>() {});
+            InputStream updateStream = Files.newInputStream(Paths.get(updateFile));
+
+            Set<PartialEntity> updateEntities = parser.parse(updateStream);
+
+            Set<PartialEntity> stateEntities = Collections.emptySet();
+
+            if ( args.length == 2){
+                InputStream stateStream = Files.newInputStream(Paths.get(args[1]));
+                stateEntities = parser.parse(stateStream);
             }
 
-            LocalAuthorityByTypeTransformer transformer = injector.getInstance(LocalAuthorityByTypeTransformer.class);
-            Set<PartialEntity> transformed = transformer.transform(entities, partialEntities);
+            Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities);
 
-            String jsonResult = JsonSerializer.serialize(transformed);
-            amazonS3.putObject(bucketName, objectName, jsonResult);
+            String rsf = rsfCreator.serializeAsRsf(transformed);
+
+            System.out.println(rsf);
+
         } else {
-            System.err.println("Usage: args required - [rsf file path] [s3 bucket] [s3 key]");
+            System.err.println("Usage: args required - [rsf file path updates] [rsf file path current state - optional] ");
         }
     }
 }
