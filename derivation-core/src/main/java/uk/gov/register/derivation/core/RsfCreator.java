@@ -2,6 +2,7 @@ package uk.gov.register.derivation.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.UncheckedIOException;
 import java.util.Set;
@@ -10,7 +11,12 @@ import java.util.stream.Stream;
 
 public class RsfCreator {
     private final String TAB = "\t";
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper ;
+
+    public RsfCreator() {
+        this.objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    }
 
     public String serializeAsRsf(Set<PartialEntity> entities) {
         return entities.stream().flatMap(pe -> getWrappedEntryStream(pe))

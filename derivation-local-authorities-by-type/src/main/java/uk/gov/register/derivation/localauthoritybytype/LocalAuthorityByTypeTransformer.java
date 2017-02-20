@@ -2,6 +2,7 @@ package uk.gov.register.derivation.localauthoritybytype;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.codec.digest.DigestUtils;
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.Item;
@@ -18,11 +19,15 @@ import static java.util.stream.Collectors.toMap;
 
 public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String LOCAL_AUTHORITIES = "local-authorities";
     private static final String LOCAL_AUTHORITY_TYPE = "local-authority-type";
     private static final String LOCAL_AUTHORITY_ENG = "local-authority-eng";
+    private final ObjectMapper objectMapper ;
 
+    public LocalAuthorityByTypeTransformer() {
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    }
 
     @Override
     public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
@@ -103,7 +108,7 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
 
     private String hashValue(Map<String, Object> fields) {
         try {
-            return DigestUtils.sha256Hex(OBJECT_MAPPER.writeValueAsString(fields));
+            return "sha-256:" + DigestUtils.sha256Hex(objectMapper.writeValueAsString(fields));
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
