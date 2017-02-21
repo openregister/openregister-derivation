@@ -1,0 +1,12 @@
+---
+local-authority-type:
+  entry-number: "7"
+  entry-timestamp: "2017-02-08T15:58:14Z"
+  item-hash: "sha-256:8ba962e71a90f51eded85b941ad51b52fb0e26cdcd694a48c74041093d39097e"
+  phase: "alpha"
+  registry: "government-digital-service"
+  text: "Types of local government organisations in the United Kingdom"
+  fields:
+  - "local-authority-type"
+  - "local-authorities"
+  register: "local-authority-type"

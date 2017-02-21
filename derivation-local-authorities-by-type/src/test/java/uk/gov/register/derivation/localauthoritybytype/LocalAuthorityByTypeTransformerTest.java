@@ -1,5 +1,6 @@
 package uk.gov.register.derivation.localauthoritybytype;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -165,6 +166,21 @@ public class LocalAuthorityByTypeTransformerTest {
         assertThat(ctyEntity.getEntries().get(1).getItem().getFields().get("local-authority-type"), is("CTY"));
         List<String> localAuthoritiesCty = (List<String>) ctyEntity.getEntries().get(1).getItem().getFields().get("local-authorities");
         assertThat(localAuthoritiesCty, is(empty()));
+    }
+
+    @Test
+    public void shouldComputeItemHash(){
+        Set<PartialEntity> update = Collections.singleton(createEntity("LEE", "NMD", "Lewes"));
+        Set<PartialEntity> state = Collections.emptySet();
+        LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
+        Set<PartialEntity> newState = transformer.transform(update, state);
+        PartialEntity newStateEntity1 = newState.iterator().next();
+
+        // fields must be in alphabetical order and no whitespace
+        String expected = "sha-256:" + DigestUtils.sha256Hex("{\"local-authorities\":[\"LEE\"],\"local-authority-type\":\"NMD\"}");
+        String itemHash = newStateEntity1.getEntries().get(0).getItemHash();
+
+        assertThat(itemHash, is(expected));
     }
 
     private PartialEntity createDerivationEntity(String localAuthorityKey, String localAuthorityTypeKey) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.UncheckedIOException;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +21,7 @@ public class RsfCreator {
 
     public String serializeAsRsf(Set<PartialEntity> entities) {
         return entities.stream().flatMap(pe -> getWrappedEntryStream(pe))
-                .sorted((e1, e2) -> Integer.compare(e1.entry.getEntryNumber(), e2.entry.getEntryNumber()))
+                .sorted(Comparator.comparingInt(e2 -> e2.entry.getEntryNumber()))
                 .map(e -> serializeItem(e.entry.getItem()) + "\n" + serializeEntry(e))
                 .collect(Collectors.joining("\n"));
     }

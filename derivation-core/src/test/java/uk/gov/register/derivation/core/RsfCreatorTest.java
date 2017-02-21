@@ -29,7 +29,7 @@ public class RsfCreatorTest {
         Item gbItem = new Item(fieldsForGB);
 
         Entry czOldEntry = new Entry(1, Instant.now(), "sha-256:cz1");
-        Entry gbEntry    = new Entry(2, Instant.now(), "sha-256:gb1");
+        Entry gbEntry = new Entry(2, Instant.now(), "sha-256:gb1");
         Entry czNewEntry = new Entry(3, Instant.now(), "sha-256:cz2");
 
         czOldEntry.setItem(czOldItem);
@@ -70,7 +70,7 @@ public class RsfCreatorTest {
         Item ctyItem = new Item(fieldsForCTY);
 
         Entry nmdOldEntry = new Entry(1, Instant.now(), "sha-256:nmd1");
-        Entry ctyEntry    = new Entry(2, Instant.now(), "sha-256:cty1");
+        Entry ctyEntry = new Entry(2, Instant.now(), "sha-256:cty1");
         Entry nmdNewEntry = new Entry(3, Instant.now(), "sha-256:nmd2");
 
         nmdOldEntry.setItem(nmdOldItem);
@@ -90,5 +90,25 @@ public class RsfCreatorTest {
 
         String[] lines = rsf.split("\n");
         assertThat(lines.length, is(6));
+    }
+
+    @Test
+    public void shouldCanonicalizeJson() {
+        Map<String, Object> fieldsForGB = new HashMap<>();
+        fieldsForGB.put("name", "United Kingdom");
+        fieldsForGB.put("country", "GB");
+        Item gbItem = new Item(fieldsForGB);
+        Entry gbEntry = new Entry(2, Instant.now(), "sha-256:gb1");
+        gbEntry.setItem(gbItem);
+        PartialEntity gbEntity = new PartialEntity("GB");
+        gbEntity.getEntries().add(gbEntry);
+
+        RsfCreator creator = new RsfCreator();
+        String rsf = creator.serializeAsRsf(Collections.singleton(gbEntity));
+
+        String[] lines = rsf.split("\n");
+        assertThat(lines.length, is(2));
+        String itemJson = lines[0].split("\t")[1];
+        assertThat( itemJson, is("{\"country\":\"GB\",\"name\":\"United Kingdom\"}"));
     }
 }

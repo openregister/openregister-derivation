@@ -1,0 +1,21 @@
+---
+local-authority-type:
+  entry-number: "17"
+  entry-timestamp: "2017-02-08T15:57:45Z"
+  item-hash: "sha-256:0696f46f01786e43c27af5c5725a552ec13719eff1d9c2768c795bfa713a72b7"
+  phase: "alpha"
+  field: "local-authority-type"
+  datatype: "string"
+  text: "The type of a local government organisation in the United Kingdom."
+  cardinality: "1"
+  register: "local-authority-type"
+local-authorities:
+  entry-number: "17"
+  entry-timestamp: "2017-02-08T15:57:45Z"
+  item-hash: "sha-256:0696f46f01786e43c27af5c5725a552ec13719eff1d9c2768c795bfa713a72b7"
+  phase: "alpha"
+  field: "local-authorities"
+  datatype: "string"
+  text: "The type of a local government organisation in the United Kingdom."
+  cardinality: "n"
+  register: "local-authorities"
