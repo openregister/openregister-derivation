@@ -1,7 +1,5 @@
 package uk.gov.register.derivation.localauthoritybytype;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.register.derivation.core.Entry;
@@ -10,16 +8,14 @@ import uk.gov.register.derivation.core.PartialEntity;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.core.Every.everyItem;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class LocalAuthorityByTypeTransformerTest {
     @Before
@@ -46,8 +42,8 @@ public class LocalAuthorityByTypeTransformerTest {
     public void shouldTransformMultipleEntriesWithSameType() throws Exception {
 
         Set<PartialEntity> update = new HashSet<>();
-        update.add(createEntity("LEE", "NMD", "Lewes"));
-        update.add(createEntity("HAS", "NMD", "Hastings"));
+        update.add(createEntity("LEE", "NMD", "Lewes", 1));
+        update.add(createEntity("HAS", "NMD", "Hastings", 2));
 
         Set<PartialEntity> state = Collections.emptySet();
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
@@ -137,12 +133,12 @@ public class LocalAuthorityByTypeTransformerTest {
     @Test
     public void shouldAddAndRemoveAuthoritiesWhenTypeChanges() throws Exception {
 
-        Set<PartialEntity> update = new HashSet<>();
-        update.add(createEntity("ESS", "NMD", "Essex"));
-
         Set<PartialEntity> state = new HashSet<>();
         state.add(createDerivationEntity("LEE", "NMD"));
         state.add(createDerivationEntity("ESS", "CTY"));
+
+        Set<PartialEntity> update = new HashSet<>();
+        update.add(createEntity("ESS", "NMD", "Essex"));
 
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
         Set<PartialEntity> newState = transformer.transform(update, state);
@@ -182,13 +178,17 @@ public class LocalAuthorityByTypeTransformerTest {
     }
 
     private PartialEntity createEntity(String key, String authorityType, String name) {
+        return createEntity(key, authorityType, name, 1);
+    }
+
+    private PartialEntity createEntity(String key, String authorityType, String name, int entryNumber) {
         PartialEntity partialEntity = new PartialEntity(key);
         Map<String, Object> fields = new HashMap<>();
         fields.put("local-authority-eng", key);
         fields.put("local-authority-type", authorityType);
         fields.put("name", name);
         Item item = new Item(fields);
-        Entry entry = new Entry(1, Instant.EPOCH, "sha-256:1");
+        Entry entry = new Entry(entryNumber, Instant.EPOCH, "sha-256:1");
         entry.setItem(item);
         partialEntity.getEntries().add(entry);
         return partialEntity;

@@ -33,6 +33,12 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
 
         Map<Integer, Entry> entries = newPartialEntities.stream().flatMap(e -> e.getEntries().stream()).collect(Collectors.toMap(e -> e.getEntryNumber(), e -> e));
         Map<String, String> allLocalAuthorities = new HashMap<>();
+        state.stream().forEach(pe -> {
+            Entry record = pe.getRecord().get();
+            List<String> localAuthorities = (List<String>) record.getItem().getFields().get(LOCAL_AUTHORITIES);
+
+            localAuthorities.forEach(la -> allLocalAuthorities.put(la, pe.getKey()));
+        });
 
         entries.values().forEach(entry -> {
             String laType = (String) entry.getItem().getFields().get(LOCAL_AUTHORITY_TYPE);
