@@ -38,24 +38,30 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
             String laType = (String) entry.getItem().getFields().get(LOCAL_AUTHORITY_TYPE);
             String localAuthority = (String) entry.getItem().getFields().get(LOCAL_AUTHORITY_ENG);
 
-            if (stateMap.containsKey(laType)) {
-                List<String> currentLocalAuthorities = (List<String>) stateMap.get(laType).getRecord()
-                        .orElseThrow(IllegalStateException::new).getItem().getFields().get(LOCAL_AUTHORITIES);
-
-                if (allLocalAuthorities.containsKey(localAuthority)) {
-                    PartialEntity pe = stateMap.get(allLocalAuthorities.get(localAuthority));
-                    List<String> localAuthList = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
-                            .getItem().getFields().get(LOCAL_AUTHORITIES);
-
-                    Entry localAuthoritiesEntryWithRemoved = createLocalAuthoritiesEntryRemoving(localAuthority, localAuthList, allLocalAuthorities, pe.getKey(), entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
-                    pe.getEntries().add(localAuthoritiesEntryWithRemoved);
-                }
-
-                Entry newLocalAuthoritiesEntry = createLocalAuthoritiesEntryAdding(localAuthority, currentLocalAuthorities, allLocalAuthorities, laType, entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
-                stateMap.get(laType).getEntries().add(newLocalAuthoritiesEntry);
-            } else {
-                stateMap.put(laType, createLaTypeEntity(laType, localAuthority, entry.getEntryNumber() + currentMaxEntryNumber));
+            if (allLocalAuthorities.containsKey(localAuthority) && allLocalAuthorities.get(localAuthority).equals(laType)) {
+                // No changes that we care about
+                return;
             }
+
+            if (allLocalAuthorities.containsKey(localAuthority)) {
+                PartialEntity pe = stateMap.get(allLocalAuthorities.get(localAuthority));
+                List<String> localAuthList = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
+                        .getItem().getFields().get(LOCAL_AUTHORITIES);
+
+                Entry localAuthoritiesEntryWithRemoved = createLocalAuthoritiesEntryRemoving(localAuthority, localAuthList, allLocalAuthorities, pe.getKey(), entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
+                pe.getEntries().add(localAuthoritiesEntryWithRemoved);
+            }
+
+            if (!stateMap.containsKey(laType)) {
+                // New LA Type, so create the entry in the Map, but also check that local authority is new
+                stateMap.put(laType, createLaTypeEntity(laType));
+            }
+
+            List<String> currentLocalAuthorities = stateMap.get(laType).getRecord().isPresent()
+                    ? (List<String>) stateMap.get(laType).getRecord().get().getItem().getFields().get(LOCAL_AUTHORITIES)
+                    : new ArrayList<>();
+            Entry newLocalAuthoritiesEntry = createLocalAuthoritiesEntryAdding(localAuthority, currentLocalAuthorities, allLocalAuthorities, laType, entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
+            stateMap.get(laType).getEntries().add(newLocalAuthoritiesEntry);
         });
 
         return new HashSet<>(stateMap.values());
@@ -89,17 +95,12 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
         return newLocalAuthoritiesEntry;
     }
 
-    private PartialEntity createLaTypeEntity(String laType, String localAuth, int entryNumber) {
+    private PartialEntity createLaTypeEntity(String laType) {
         PartialEntity laTypeEntity = new PartialEntity(laType);
         Map<String, Object> fields = new HashMap<>();
         fields.put(LOCAL_AUTHORITY_TYPE, laType);
         LinkedList<String> localAuthList = new LinkedList<>();
-        localAuthList.add(localAuth);
         fields.put(LOCAL_AUTHORITIES, localAuthList);
-        Item item = new Item(fields);
-        Entry entry = new Entry(entryNumber, Instant.now(), hashValue(fields));
-        entry.setItem(item);
-        laTypeEntity.getEntries().add(entry);
         return laTypeEntity;
     }
 
