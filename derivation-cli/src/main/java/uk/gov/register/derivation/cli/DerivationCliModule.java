@@ -6,6 +6,7 @@ import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.generic.GenericGrouper;
 import uk.gov.register.derivation.generic.GenericTransformer;
 import uk.gov.register.derivation.generic.Grouper;
+import uk.gov.register.derivation.generic.filters.CountriesThatHaveFirstLetterAfterKFilter;
 import uk.gov.register.derivation.generic.filters.CurrentCountryFilter;
 import uk.gov.register.derivation.generic.filters.Filter;
 import uk.gov.register.derivation.generic.groupings.CountryByCodeGrouping;
@@ -20,6 +21,7 @@ public class DerivationCliModule extends AbstractModule {
 
         Multibinder<Filter> filters = Multibinder.newSetBinder(binder(), Filter.class);
         filters.addBinding().to(CurrentCountryFilter.class);
+        filters.addBinding().to(CountriesThatHaveFirstLetterAfterKFilter.class);
 
         Multibinder<Grouping> groupings = Multibinder.newSetBinder(binder(), Grouping.class);
         groupings.addBinding().to(CountryByFirstLetterGrouping.class);

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 public class Main {
-
     public static void main(String[] args) throws IOException, ParseException {
         if (args.length > 0) {
             Injector injector = Guice.createInjector(new DerivationCliModule());
@@ -42,10 +41,10 @@ public class Main {
                 stateEntities = parser.parse(stateStream);
             }
 
-            List<String> filters = Arrays.asList(commandLine.getOptionValues("filters"));
-            List<String> groupers = Arrays.asList(commandLine.getOptionValues("groupings"));
+            List<String> filters = Arrays.asList(commandLine.getOptionValue("filters").split(","));
+            List<String> groupings = Arrays.asList(commandLine.getOptionValue("groupings").split(","));
 
-            Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities, filters, groupers);
+            Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities, filters, groupings);
 
             String rsf = rsfCreator.serializeAsRsf(transformed);
 
@@ -63,12 +62,10 @@ public class Main {
 
         Option filtersOpt = new Option("filters", true, "Specifies the filters to apply\nOptions:\n- currentCountries");
         filtersOpt.setArgs(1);
-        filtersOpt.setValueSeparator('|');
 
         Option groupersOpt = new Option("groupings", true,
                 "Specifies the groupings to apply\nOptions:\n- countriesByCode\n- countriesByFirstThreeLetters");
         groupersOpt.setArgs(1);
-        groupersOpt.setValueSeparator('|');
 
         options.addOption(filtersOpt);
         options.addOption(groupersOpt);
