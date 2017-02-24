@@ -24,7 +24,7 @@ public class RsfCreator {
     }
 
     private String serializeEntry(EntryWrapper entryWrapper) {
-        return "append-entry" + TAB + entryWrapper.entry.getTimestampAsString() + TAB + entryWrapper.entry.getItemHash() + TAB + entryWrapper.key;
+        return "append-entry" + TAB + entryWrapper.entry.getEntryNumber() + TAB + entryWrapper.entry.getTimestampAsString() + TAB + entryWrapper.entry.getItemHash() + TAB + entryWrapper.key;
     }
 
     private String serializeItem(Item item) {

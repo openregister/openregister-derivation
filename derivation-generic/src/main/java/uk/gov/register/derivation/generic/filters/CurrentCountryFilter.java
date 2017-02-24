@@ -1,8 +1,7 @@
-package uk.gov.register.derivation.currentcountries;
+package uk.gov.register.derivation.generic.filters;
 
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.PartialEntity;
-import uk.gov.register.derivation.core.RegisterTransformer;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,41 +10,37 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
-import static java.time.temporal.ChronoField.*;
-import static java.util.stream.Collectors.toMap;
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.INSTANT_SECONDS;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 
-public class CurrentCountryFilter implements RegisterTransformer {
+public class CurrentCountryFilter implements Filter {
     private final DateTimeFormatter dateTimeFormatter;
 
     public CurrentCountryFilter() {
-        dateTimeFormatter = new DateTimeFormatterBuilder()
+        this.dateTimeFormatter = new DateTimeFormatterBuilder()
                 .appendOptional(DateTimeFormatter.ISO_INSTANT)
                 .appendOptional(DateTimeFormatter.ISO_LOCAL_DATE)
                 .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM"))
                 .toFormatter();
     }
 
-    @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
-        final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, Function.identity()));
-        newPartialEntities.forEach(newEntity -> {
-            String countryCode = newEntity.getKey();
-            if (endsBefore(newEntity, now())) {
-                stateMap.remove(countryCode);
-            }
-            else if (stateMap.containsKey(countryCode)) {
-                stateMap.get(countryCode).getEntries().addAll(newEntity.getEntries());
-            }
-            else {
-                stateMap.put(countryCode, newEntity);
-            }
-        });
-        return new HashSet<>(stateMap.values());
+    public void apply(PartialEntity entity, Map<String, PartialEntity> stateMap) {
+        String countryCode = entity.getKey();
+        if (endsBefore(entity, Instant.now())) {
+            stateMap.remove(countryCode);
+        }
+        else if (stateMap.containsKey(countryCode)) {
+            stateMap.get(countryCode).getEntries().addAll(entity.getEntries());
+        }
+        else {
+            stateMap.put(countryCode, entity);
+        }
     }
 
     private boolean endsBefore(PartialEntity entity, final Instant time) {

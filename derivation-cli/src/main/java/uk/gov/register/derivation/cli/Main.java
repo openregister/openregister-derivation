@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.core.RsfCreator;
 import uk.gov.register.derivation.core.RsfParser;
-import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
+import uk.gov.register.derivation.generic.GenericTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public class Main {
             Injector injector = Guice.createInjector(new DerivationCliModule());
 
             RsfParser parser = injector.getInstance(RsfParser.class);
-            LocalAuthorityByTypeTransformer transformer = injector.getInstance(LocalAuthorityByTypeTransformer.class);
+            GenericTransformer transformer = injector.getInstance(GenericTransformer.class);
             RsfCreator rsfCreator = injector.getInstance(RsfCreator.class);
 
             InputStream updateStream = Files.newInputStream(Paths.get(updateFile));

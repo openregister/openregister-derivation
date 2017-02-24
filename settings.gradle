@@ -3,4 +3,6 @@ include 'derivation-core'
 include 'derivation-cli'
 include 'derivation-current-countries'
 include 'derivation-local-authorities-by-type'
+include 'derivation-current-countries-by-code'
+include 'derivation-generic'
 
