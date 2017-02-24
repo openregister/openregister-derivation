@@ -229,13 +229,13 @@ public class LocalAuthorityByTypeTransformerTest {
         assertThat( nmdEntityEntries.get(3).getEntryNumber(), is(5));
         assertThat( nmdEntityEntries.get(4).getEntryNumber(), is(6));
         assertThat( nmdEntityEntries.get(5).getEntryNumber(), is(7));
-        assertThat( nmdEntityEntries.get(6).getEntryNumber(), is(9));
+        assertThat( nmdEntityEntries.get(6).getEntryNumber(), is(8));
 
         assertTrue(entityMap.containsKey("CTY"));
         PartialEntity ctyEntity = entityMap.get("CTY");
         List<Entry> ctyEntries = ctyEntity.getEntries();
         assertThat( ctyEntries.get(0).getEntryNumber(), is(3));
-        assertThat( ctyEntries.get(1).getEntryNumber(), is(8));
+        assertThat( ctyEntries.get(1).getEntryNumber(), is(9));
     }
 
     private PartialEntity createDerivationEntity(String localAuthorityKey, String localAuthorityTypeKey) {
