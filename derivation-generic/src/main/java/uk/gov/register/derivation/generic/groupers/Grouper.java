@@ -7,5 +7,5 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface Grouper {
-    void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap);
+    void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap, Grouping grouping);
 }

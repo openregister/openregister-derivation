@@ -19,7 +19,7 @@ public class CountryGroupByFirstLetterGrouper implements Grouper {
     private static final String COUNTRY_NAME = "name";
 
     @Override
-    public void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap) {
+    public void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap, Grouping grouping) {
         AtomicInteger rollingNumber = new AtomicInteger(0);
 
         entries.forEach(entry -> {

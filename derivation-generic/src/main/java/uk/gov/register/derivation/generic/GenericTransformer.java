@@ -6,6 +6,7 @@ import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.generic.filters.Filter;
 import uk.gov.register.derivation.generic.groupers.Grouper;
+import uk.gov.register.derivation.generic.groupers.Grouping;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,12 +18,14 @@ public class GenericTransformer implements RegisterTransformer {
     private static final String COUNTRIES = "countries";
 
     private final Set<Filter> filters;
-    private final Set<Grouper> groupers;
+    private final Set<Grouping> groupings;
+    private final Grouper grouper;
 
     @Inject
-    public GenericTransformer(Set<Filter> filters, Set<Grouper> groupers) {
+    public GenericTransformer(Set<Filter> filters, Set<Grouping> groupings, Grouper grouper) {
         this.filters = filters;
-        this.groupers = groupers;
+        this.groupings = groupings;
+        this.grouper = grouper;
     }
 
     @Override
@@ -35,8 +38,8 @@ public class GenericTransformer implements RegisterTransformer {
 
         // Apply function to group countries by code
         Set<PartialEntity> transformedEntities = filteredEntities;
-        for (Grouper grouper : groupers) {
-            transformedEntities = groupEntities(filteredEntities, state, grouper);
+        for (Grouping grouping : groupings) {
+            transformedEntities = groupEntities(filteredEntities, state, grouping);
         }
 
         // Return result
@@ -53,7 +56,7 @@ public class GenericTransformer implements RegisterTransformer {
         return new HashSet<>(stateMap.values());
     }
 
-    private Set<PartialEntity> groupEntities(Set<PartialEntity> updates, Set<PartialEntity> state, Grouper grouper) {
+    private Set<PartialEntity> groupEntities(Set<PartialEntity> updates, Set<PartialEntity> state, Grouping grouping) {
         final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, identity()));
 
         Map<Integer, Entry> entries = updates.stream().flatMap(e -> e.getEntries().stream()).collect(Collectors.toMap(e -> e.getEntryNumber(), e -> e));
@@ -65,7 +68,7 @@ public class GenericTransformer implements RegisterTransformer {
             itemsInList.forEach(key -> allItems.put(key, pe.getKey()));
         });
 
-        grouper.group(entries.values(), currentMaxEntryNumber(state), allItems, stateMap);
+        grouper.group(entries.values(), currentMaxEntryNumber(state), allItems, stateMap, grouping);
 
         return new HashSet<>(stateMap.values());
     }

@@ -15,17 +15,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GenericGrouper implements Grouper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private static final String COUNTRIES = "countries";
-    private static final String COUNTRY_CODE = "name";
-    private static final String COUNTRY_NAME = "name";
-
     @Override
-    public void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap) {
+    public void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap, Grouping grouping) {
         AtomicInteger rollingNumber = new AtomicInteger(0);
 
         entries.forEach(entry -> {
-            String groupKey = Character.toString(entry.getItem().getFields().get(COUNTRY_CODE).toString().charAt(0));
-            String groupItem = (String) entry.getItem().getFields().get(COUNTRY_NAME);
+            String groupKey = Character.toString(entry.getItem().getFields().get(grouping.getKeyFieldName()).toString().charAt(0));
+            String groupItem = (String) entry.getItem().getFields().get(grouping.getItemField());
 
             if (allItems.containsKey(groupItem) && allItems.get(groupItem).equals(groupKey)) {
                 // No changes that we care about - item has not moved groups
@@ -34,15 +30,14 @@ public class GenericGrouper implements Grouper {
 
             if (allItems.containsKey(groupItem)) {
                 // Item has moved groups
+                
                 PartialEntity pe = stateMap.get(allItems.get(groupItem));
                 List<String> groupItems = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
-                        .getItem().getFields().get(COUNTRIES);
-
-//                Entry localAuthoritiesEntryWithRemoved = createCountriesEntryRemoving(countryName, localAuthList, allItems, pe.getKey(), entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
+                        .getItem().getFields().get(grouping.getKeyFieldName());
 
                 Entry localAuthoritiesEntryWithRemoved = createRemovingEntry(
-                        new AbstractMap.SimpleEntry<>(COUNTRY_CODE, groupKey),
-                        new AbstractMap.SimpleEntry<>(COUNTRIES, groupItem),
+                        new AbstractMap.SimpleEntry<>(grouping.getKeyFieldName(), groupKey),
+                        new AbstractMap.SimpleEntry<>(grouping.getItemFieldName(), groupItem),
                         allItems,
                         groupItems,
                         entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
@@ -52,26 +47,23 @@ public class GenericGrouper implements Grouper {
 
             if (!stateMap.containsKey(groupKey)) {
                 // New LA Type, so create the entry in the Map, but also check that local authority is new
-                //stateMap.put(countryCode, createCountryCodeEntity(countryCode));
 
                 stateMap.put(
                         groupKey,
-                        createGroupingEntity(new AbstractMap.SimpleEntry<>(COUNTRY_CODE, groupKey), groupKey));
+                        createGroupingEntity(new AbstractMap.SimpleEntry<>(grouping.getItemField(), groupKey), groupKey));
             }
 
             List<String> groupItems = stateMap.get(groupKey).getRecord().isPresent()
-                    ? (List<String>) stateMap.get(groupKey).getRecord().get().getItem().getFields().get(COUNTRIES)
+                    ? (List<String>) stateMap.get(groupKey).getRecord().get().getItem().getFields().get(grouping.getItemFieldName())
                     : new ArrayList<>();
 
             if (groupItems == null) {
                 groupItems = new ArrayList<>();
             }
 
-//            Entry newLocalAuthoritiesEntry = createCountriesEntryAdding(countryName, currentLocalAuthorities, allItems, countryCode, entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
-
             Entry newEntry = createAddingEntry(
-                    new AbstractMap.SimpleEntry<>(COUNTRY_CODE, groupKey),
-                    new AbstractMap.SimpleEntry<>(COUNTRIES, groupItem),
+                    new AbstractMap.SimpleEntry<>(grouping.getKeyFieldName(), groupKey),
+                    new AbstractMap.SimpleEntry<>(grouping.getItemFieldName(), groupItem),
                     allItems,
                     groupItems,
                     entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
