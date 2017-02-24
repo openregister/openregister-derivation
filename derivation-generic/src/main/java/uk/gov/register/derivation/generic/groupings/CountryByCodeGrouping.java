@@ -23,6 +23,11 @@ public class CountryByCodeGrouping implements Grouping {
     }
 
     @Override
+    public String getName() {
+        return "countriesByCode";
+    }
+
+    @Override
     public Optional<String> transformKey(String key) {
         return Optional.empty();
     }

@@ -24,8 +24,6 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
     private static final String LOCAL_AUTHORITY_TYPE = "local-authority-type";
     private static final String LOCAL_AUTHORITY_ENG = "local-authority-eng";
 
-
-    @Override
     public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
         final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, Function.identity()));
         int currentMaxEntryNumber = currentMaxEntryNumber(state);
@@ -118,5 +116,8 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
         }
     }
 
-
+    @Override
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> filters, List<String> groupers) {
+        return null;
+    }
 }

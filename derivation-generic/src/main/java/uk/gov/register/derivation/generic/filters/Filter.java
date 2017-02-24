@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface Filter {
     void apply(PartialEntity entity, Map<String, PartialEntity> stateMap);
+
+    String getName();
 }

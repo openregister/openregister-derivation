@@ -16,29 +16,37 @@ import static java.util.stream.Collectors.toMap;
 public class GenericTransformer implements RegisterTransformer {
     private static final String COUNTRIES = "countries";
 
-    private final Set<Filter> filters;
-    private final Set<Grouping> groupings;
+    private final Map<String, Filter> allFilters;
+    private final Map<String, Grouping> allGroupings;
     private final Grouper grouper;
 
     @Inject
-    public GenericTransformer(Set<Filter> filters, Set<Grouping> groupings, Grouper grouper) {
-        this.filters = filters;
-        this.groupings = groupings;
+    public GenericTransformer(Set<Filter> allFilters, Set<Grouping> allGroupings, Grouper grouper) {
+        this.allFilters = allFilters.stream().collect(Collectors.toMap(f -> f.getName(), f -> f));
+        this.allGroupings = allGroupings.stream().collect(Collectors.toMap(g -> g.getName(), g -> g));
         this.grouper = grouper;
     }
 
     @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> filters, List<String> groupings) {
         // Apply function to remove countries with end-date
         Set<PartialEntity> filteredEntities = newPartialEntities;
-        for (Filter filter : filters) {
-            filteredEntities = filterEntities(filteredEntities, state, filter);
+        for (String filter : filters) {
+            if (!allFilters.containsKey(filter)) {
+                throw new RuntimeException("Unknown filter specified: " + filter);
+            }
+
+            filteredEntities = filterEntities(filteredEntities, state, allFilters.get(filter));
         }
 
         // Apply function to group countries by code
         Set<PartialEntity> transformedEntities = filteredEntities;
-        for (Grouping grouping : groupings) {
-            transformedEntities = groupEntities(filteredEntities, state, grouping);
+        for (String grouping : groupings) {
+            if (!allGroupings.containsKey(grouping)) {
+                throw new RuntimeException("Unknown grouping specified: " + grouping);
+            }
+
+            transformedEntities = groupEntities(filteredEntities, state, allGroupings.get(grouping));
         }
 
         // Return result

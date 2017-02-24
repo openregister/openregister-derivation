@@ -6,6 +6,7 @@ public interface Grouping {
     String getKeyFieldName();
     String getItemFieldName();
     String getItemField();
+    String getName();
 
     Optional<String> transformKey(String key);
 }

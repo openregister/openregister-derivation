@@ -23,6 +23,11 @@ public class CountryByFirstLetterGrouping implements Grouping {
     }
 
     @Override
+    public String getName() {
+        return "countriesByFirstThreeLetters";
+    }
+
+    @Override
     public Optional<String> transformKey(String key) {
         return Optional.of(key.substring(0, 3));
     }

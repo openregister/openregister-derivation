@@ -3,13 +3,13 @@ package uk.gov.register.derivation.cli;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import uk.gov.register.derivation.core.RegisterTransformer;
+import uk.gov.register.derivation.generic.GenericGrouper;
 import uk.gov.register.derivation.generic.GenericTransformer;
+import uk.gov.register.derivation.generic.Grouper;
 import uk.gov.register.derivation.generic.filters.CurrentCountryFilter;
 import uk.gov.register.derivation.generic.filters.Filter;
 import uk.gov.register.derivation.generic.groupings.CountryByCodeGrouping;
 import uk.gov.register.derivation.generic.groupings.CountryByFirstLetterGrouping;
-import uk.gov.register.derivation.generic.GenericGrouper;
-import uk.gov.register.derivation.generic.Grouper;
 import uk.gov.register.derivation.generic.groupings.Grouping;
 
 public class DerivationCliModule extends AbstractModule {
@@ -27,4 +27,6 @@ public class DerivationCliModule extends AbstractModule {
 
         bind(Grouper.class).to(GenericGrouper.class);
     }
+
+
 }

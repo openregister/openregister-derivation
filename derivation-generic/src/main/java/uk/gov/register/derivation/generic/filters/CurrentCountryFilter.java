@@ -43,6 +43,10 @@ public class CurrentCountryFilter implements Filter {
         }
     }
 
+    public String getName() {
+        return "currentCountries";
+    }
+
     private boolean endsBefore(PartialEntity entity, final Instant time) {
         List<Entry> entries = entity.getEntries();
         Entry current = entries.get(entries.size() - 1);

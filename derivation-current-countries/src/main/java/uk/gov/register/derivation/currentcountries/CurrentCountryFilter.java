@@ -30,7 +30,6 @@ public class CurrentCountryFilter implements RegisterTransformer {
                 .toFormatter();
     }
 
-    @Override
     public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
         final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, Function.identity()));
         newPartialEntities.forEach(newEntity -> {
@@ -67,5 +66,10 @@ public class CurrentCountryFilter implements RegisterTransformer {
         } else {
             throw new DateTimeParseException("Failed to parse date", date, 0);
         }
+    }
+
+    @Override
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> filters, List<String> groupers) {
+        return null;
     }
 }
