@@ -1,8 +1,10 @@
-package uk.gov.register.derivation.generic.groupers;
+package uk.gov.register.derivation.generic.groupings;
 
-public class CountryByFirstLetterGrouping implements Grouping {
+import java.util.Optional;
+
+public class CountryByCodeGrouping implements Grouping {
     private static final String COUNTRIES = "countries";
-    private static final String COUNTRY_CODE = "name";
+    private static final String COUNTRY_CODE = "country";
     private static final String COUNTRY_NAME = "name";
 
     @Override
@@ -18,5 +20,10 @@ public class CountryByFirstLetterGrouping implements Grouping {
     @Override
     public String getItemField() {
         return COUNTRY_NAME;
+    }
+
+    @Override
+    public Optional<String> transformKey(String key) {
+        return Optional.empty();
     }
 }

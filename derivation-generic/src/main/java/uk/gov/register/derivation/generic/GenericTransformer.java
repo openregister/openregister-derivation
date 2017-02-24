@@ -5,8 +5,7 @@ import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.generic.filters.Filter;
-import uk.gov.register.derivation.generic.groupers.Grouper;
-import uk.gov.register.derivation.generic.groupers.Grouping;
+import uk.gov.register.derivation.generic.groupings.Grouping;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package uk.gov.register.derivation.generic.groupers;
+package uk.gov.register.derivation.generic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.Item;
 import uk.gov.register.derivation.core.PartialEntity;
+import uk.gov.register.derivation.generic.groupings.Grouping;
 
 import java.io.UncheckedIOException;
 import java.time.Instant;
@@ -20,8 +21,10 @@ public class GenericGrouper implements Grouper {
         AtomicInteger rollingNumber = new AtomicInteger(0);
 
         entries.forEach(entry -> {
-            String groupKey = Character.toString(entry.getItem().getFields().get(grouping.getKeyFieldName()).toString().charAt(0));
+            String groupKey = entry.getItem().getFields().get(grouping.getKeyFieldName()).toString();
             String groupItem = (String) entry.getItem().getFields().get(grouping.getItemField());
+
+            groupKey = grouping.transformKey(groupKey).orElse(groupKey);
 
             if (allItems.containsKey(groupItem) && allItems.get(groupItem).equals(groupKey)) {
                 // No changes that we care about - item has not moved groups
@@ -30,16 +33,12 @@ public class GenericGrouper implements Grouper {
 
             if (allItems.containsKey(groupItem)) {
                 // Item has moved groups
-                
+
                 PartialEntity pe = stateMap.get(allItems.get(groupItem));
                 List<String> groupItems = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
                         .getItem().getFields().get(grouping.getKeyFieldName());
 
-                Entry localAuthoritiesEntryWithRemoved = createRemovingEntry(
-                        new AbstractMap.SimpleEntry<>(grouping.getKeyFieldName(), groupKey),
-                        new AbstractMap.SimpleEntry<>(grouping.getItemFieldName(), groupItem),
-                        allItems,
-                        groupItems,
+                Entry localAuthoritiesEntryWithRemoved = createRemovingEntry(groupKey, grouping, allItems, groupItems,
                         entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
 
                 pe.getEntries().add(localAuthoritiesEntryWithRemoved);
@@ -47,10 +46,7 @@ public class GenericGrouper implements Grouper {
 
             if (!stateMap.containsKey(groupKey)) {
                 // New LA Type, so create the entry in the Map, but also check that local authority is new
-
-                stateMap.put(
-                        groupKey,
-                        createGroupingEntity(new AbstractMap.SimpleEntry<>(grouping.getItemField(), groupKey), groupKey));
+                stateMap.put(groupKey, createGroupingEntity(groupKey, grouping));
             }
 
             List<String> groupItems = stateMap.get(groupKey).getRecord().isPresent()
@@ -61,55 +57,45 @@ public class GenericGrouper implements Grouper {
                 groupItems = new ArrayList<>();
             }
 
-            Entry newEntry = createAddingEntry(
-                    new AbstractMap.SimpleEntry<>(grouping.getKeyFieldName(), groupKey),
-                    new AbstractMap.SimpleEntry<>(grouping.getItemFieldName(), groupItem),
-                    allItems,
-                    groupItems,
+            Entry newEntry = createAddingEntry(groupKey, groupItem, grouping, allItems, groupItems,
                     entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
 
             stateMap.get(groupKey).getEntries().add(newEntry);
         });
     }
 
-    private Entry createAddingEntry(Map.Entry<String, String> groupKey, Map.Entry<String, String> item, Map<String, String> allItems, List<String> currentItems, int entryNumber) {
+    private Entry createAddingEntry(String groupKey, String item, Grouping grouping, Map<String, String> allItems, List<String> currentItems, int entryNumber) {
         List<String> updatedGroupValues = new ArrayList<>(currentItems);
-        updatedGroupValues.add(item.getValue());
-        allItems.put(item.getValue(), groupKey.getValue());
+        updatedGroupValues.add(item);
+        allItems.put(item, groupKey);
 
-        return createGroupingEntry(
-                new AbstractMap.SimpleEntry(groupKey.getKey(), groupKey.getValue()),
-                new AbstractMap.SimpleEntry<>(item.getKey(), updatedGroupValues),
-                entryNumber);
+        return createGroupingEntry(groupKey, updatedGroupValues, grouping, entryNumber);
     }
 
-    private Entry createRemovingEntry(Map.Entry<String, String> groupKey, Map.Entry<String, String> item, Map<String, String> allItems, List<String> currentItems, int entryNumber) {
+    private Entry createRemovingEntry(String groupKey, Grouping grouping, Map<String, String> allItems, List<String> currentItems, int entryNumber) {
         List<String> updatedGroupValues = new ArrayList<>(currentItems);
-        updatedGroupValues.remove(groupKey.getValue());
-        allItems.remove(groupKey.getValue());
+        updatedGroupValues.remove(groupKey);
+        allItems.remove(groupKey);
 
-        return createGroupingEntry(
-                new AbstractMap.SimpleEntry<>(groupKey.getKey(), groupKey.getValue()),
-                new AbstractMap.SimpleEntry<>(item.getKey(), updatedGroupValues),
-                entryNumber);
+        return createGroupingEntry(groupKey, updatedGroupValues, grouping, entryNumber);
     }
 
-    private Entry createGroupingEntry(Map.Entry<String, Object> groupKey, Map.Entry<String, List<String>> groupItems, int entryNumber) {
+    private Entry createGroupingEntry(String groupKey, List<String> groupItems, Grouping grouping, int entryNumber) {
         Map<String, Object> newFields = new HashMap<>();
-        newFields.put(groupKey.getKey(), groupKey.getValue());
-        newFields.put(groupItems.getKey(), groupItems.getValue());
+        newFields.put(grouping.getKeyFieldName(), groupKey);
+        newFields.put(grouping.getItemFieldName(), groupItems);
         Item item = new Item(newFields);
         Entry entry = new Entry(entryNumber, Instant.now(), hashValue(newFields));
         entry.setItem(item);
         return entry;
     }
 
-    private PartialEntity createGroupingEntity(Map.Entry<String, String> groupKey, String groupItemKey) {
-        PartialEntity entity = new PartialEntity(groupKey.getValue());
+    private PartialEntity createGroupingEntity(String groupKey, Grouping grouping) {
+        PartialEntity entity = new PartialEntity(groupKey);
         Map<String, Object> fields = new HashMap<>();
-        fields.put(groupKey.getKey(), groupKey.getValue());
+        fields.put(grouping.getKeyFieldName(), groupKey);
         LinkedList<String> groupItems = new LinkedList<>();
-        fields.put(groupItemKey, groupItems);
+        fields.put(grouping.getItemFieldName(), groupItems);
         return entity;
     }
 

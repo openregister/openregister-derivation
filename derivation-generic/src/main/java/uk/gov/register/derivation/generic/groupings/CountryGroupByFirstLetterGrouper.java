@@ -1,4 +1,4 @@
-package uk.gov.register.derivation.generic.groupers;
+package uk.gov.register.derivation.generic.groupings;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.Item;
 import uk.gov.register.derivation.core.PartialEntity;
+import uk.gov.register.derivation.generic.Grouper;
 
 import java.io.UncheckedIOException;
 import java.time.Instant;
