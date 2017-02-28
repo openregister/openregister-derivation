@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 public class DerivationUtils {
 
-    public static Stream<KeyedEntry> toSortedEntrySteam(Set<PartialEntity> entities) {
+    public static Stream<KeyedEntry> asEntryLog(Set<PartialEntity> entities) {
         return entities.stream().flatMap(pe -> getKeyedEntryStream(pe))
                 .sorted(Comparator.comparingInt(e2 -> e2.entry.getEntryNumber()));
     }

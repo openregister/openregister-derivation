@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toMap;
 
 public abstract class GroupingTransformer extends SwitchingTransformer {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state) {
@@ -31,7 +31,7 @@ public abstract class GroupingTransformer extends SwitchingTransformer {
             localAuthorities.forEach(la -> sourceKeyToGroupingKeyMap.put(la, pe.getKey()));
         });
 
-        DerivationUtils.toSortedEntrySteam(newPartialEntities).forEach(keyedEntry -> {
+        DerivationUtils.asEntryLog(newPartialEntities).forEach(keyedEntry -> {
 
             // e.g. local-authority-type
             String groupingFieldValue = (String) keyedEntry.entry.getItem().getFields().get(groupingField());
