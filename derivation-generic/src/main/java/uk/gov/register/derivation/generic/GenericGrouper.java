@@ -21,76 +21,75 @@ public class GenericGrouper implements Grouper {
         AtomicInteger rollingNumber = new AtomicInteger(0);
 
         entries.forEach(entry -> {
-            String groupKey = entry.getItem().getFields().containsKey(grouping.getKeyFieldName())
+            String itemKey = entry.getItem().getFields().containsKey(grouping.getKeyFieldName())
                     ? entry.getItem().getFields().get(grouping.getKeyFieldName()).toString()
                     : entry.getItem().getFields().get(grouping.getItemFieldName()).toString();
-
-            String groupItem = (String) entry.getItem().getFields().get(grouping.getItemField());
+            String itemValue = (String) entry.getItem().getFields().get(grouping.getItemField());
 
             List<String> groupKeys = grouping.calculateKeys(entry.getItem());
             if (groupKeys == null || groupKeys.isEmpty()) {
-                groupKeys = Arrays.asList(groupKey);
+                groupKeys = Arrays.asList(itemKey);
             }
 
-            groupKeys.forEach(subKey -> {
-                if (allItems.containsKey(subKey) && allItems.get(subKey).contains(groupKey)) {
+            groupKeys.forEach(groupKey -> {
+                if (allItems.containsKey(groupKey) && allItems.get(groupKey).contains(itemKey)) {
                     // No changes that we care about - item has not moved groups
                     return;
                 }
 
-                if (allItems.containsKey(subKey) && stateMap.containsKey(groupItem)) {
+                if (allItems.containsKey(groupKey) && stateMap.containsKey(groupKey)) {
                     // Item has moved groups
-                    PartialEntity pe = stateMap.get(groupItem);
+                    PartialEntity pe = stateMap.get(groupKey);
                     List<String> groupItems = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
                             .getItem().getFields().get(grouping.getItemFieldName());
 
-                    Entry removingEntry = createRemovingEntry(groupKey, subKey, grouping, allItems, groupItems,
+                    Entry removingEntry = createRemovingEntry(groupKey, itemValue, grouping, allItems, groupItems,
                             entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.getAndIncrement());
 
                     pe.getEntries().add(removingEntry);
                 }
 
-                if (!stateMap.containsKey(subKey)) {
-                    stateMap.put(subKey, createGroupingEntity(subKey, grouping));
+                if (!stateMap.containsKey(groupKey)) {
+                    stateMap.put(groupKey, createGroupingEntity(groupKey, grouping));
                 }
 
-                List<String> groupItems = stateMap.get(subKey).getRecord().isPresent()
-                        ? (List<String>) stateMap.get(subKey).getRecord().get().getItem().getFields().get(grouping.getItemFieldName())
+                List<String> groupItems = stateMap.get(groupKey).getRecord().isPresent()
+                        ? (List<String>) stateMap.get(groupKey).getRecord().get().getItem().getFields().get(grouping.getItemFieldName())
                         : new ArrayList<>();
 
                 if (groupItems == null) {
                     groupItems = new ArrayList<>();
                 }
 
-                Entry newEntry = createAddingEntry(groupKey, subKey, grouping, allItems, groupItems,
+                Entry newEntry = createAddingEntry(groupKey, itemValue, grouping, allItems, groupItems,
                         entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
 
-                stateMap.get(subKey).getEntries().add(newEntry);
+                stateMap.get(groupKey).getEntries().add(newEntry);
             });
         });
     }
 
-    private Entry createAddingEntry(String groupKey, String subKey, Grouping grouping, Map<String, List<String>> allItems, List<String> currentItems, int entryNumber) {
+    private Entry createAddingEntry(String groupKey, String itemValue, Grouping grouping, Map<String, List<String>> allItems, List<String> currentItems, int entryNumber) {
         List<String> updatedGroupValues = new ArrayList<>(currentItems);
-        updatedGroupValues.add(groupKey);
+        updatedGroupValues.add(itemValue);
 
-        if (!allItems.containsKey(groupKey)) {
-            allItems.put(groupKey, new ArrayList<>());
+        if (!allItems.containsKey(itemValue)) {
+            allItems.put(itemValue, new ArrayList<>());
         }
-        allItems.get(groupKey).add(subKey);
+        allItems.get(itemValue).add(groupKey);
 
-        return createGroupingEntry(subKey, updatedGroupValues, grouping, entryNumber);
+        return createGroupingEntry(groupKey, updatedGroupValues, grouping, entryNumber);
     }
 
-    private Entry createRemovingEntry(String groupKey, String subKey, Grouping grouping, Map<String, List<String>> allItems, List<String> currentItems, int entryNumber) {
+    private Entry createRemovingEntry(String groupKey, String itemValue, Grouping grouping, Map<String, List<String>> allItems, List<String> currentItems, int entryNumber) {
         List<String> updatedGroupValues = new ArrayList<>(currentItems);
-        updatedGroupValues.remove(groupKey);
+        updatedGroupValues.remove(itemValue);
 
-        if (allItems.get(subKey).size() > 1) {
-            allItems.get(subKey).remove(groupKey);
+        if (allItems.get(groupKey).size() > 1) {
+            allItems.get(groupKey).remove(itemValue);
         }
         else {
-            allItems.remove(subKey);
+            allItems.remove(groupKey);
         }
 
         return createGroupingEntry(groupKey, updatedGroupValues, grouping, entryNumber);
