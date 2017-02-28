@@ -70,7 +70,7 @@ public class GenericTransformer implements RegisterTransformer {
         Map<String, List<String>> allItems = new HashMap<>();
         state.stream().forEach(pe -> {
             Entry record = pe.getRecord().get();
-            List<String> itemsInList = (List<String>) record.getItem().getFields().get(COUNTRIES);
+            List<String> itemsInList = (List<String>) record.getItem().getFields().get(grouping.getItemField());
 
 //            itemsInList.forEach(key -> allItems.put(key, pe.getKey()));
 
