@@ -12,6 +12,7 @@ import uk.gov.register.derivation.generic.filters.Filter;
 import uk.gov.register.derivation.generic.groupings.CountryByCodeGrouping;
 import uk.gov.register.derivation.generic.groupings.CountryByFirstLetterGrouping;
 import uk.gov.register.derivation.generic.groupings.Grouping;
+import uk.gov.register.derivation.generic.groupings.SchoolsByAgeGrouping;
 
 public class DerivationCliModule extends AbstractModule {
     @Override
@@ -26,9 +27,8 @@ public class DerivationCliModule extends AbstractModule {
         Multibinder<Grouping> groupings = Multibinder.newSetBinder(binder(), Grouping.class);
         groupings.addBinding().to(CountryByFirstLetterGrouping.class);
         groupings.addBinding().to(CountryByCodeGrouping.class);
+        groupings.addBinding().to(SchoolsByAgeGrouping.class);
 
         bind(Grouper.class).to(GenericGrouper.class);
     }
-
-
 }

@@ -1,5 +1,8 @@
 package uk.gov.register.derivation.generic.groupings;
 
+import uk.gov.register.derivation.core.Item;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface Grouping {
@@ -9,4 +12,6 @@ public interface Grouping {
     String getName();
 
     Optional<String> transformKey(String key);
+
+    List<String> calculateKeys(Item item);
 }

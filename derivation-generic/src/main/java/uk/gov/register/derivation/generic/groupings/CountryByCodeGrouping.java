@@ -1,5 +1,8 @@
 package uk.gov.register.derivation.generic.groupings;
 
+import uk.gov.register.derivation.core.Item;
+
+import java.util.List;
 import java.util.Optional;
 
 public class CountryByCodeGrouping implements Grouping {
@@ -30,5 +33,10 @@ public class CountryByCodeGrouping implements Grouping {
     @Override
     public Optional<String> transformKey(String key) {
         return Optional.empty();
+    }
+
+    @Override
+    public List<String> calculateKeys(Item item) {
+        return null;
     }
 }

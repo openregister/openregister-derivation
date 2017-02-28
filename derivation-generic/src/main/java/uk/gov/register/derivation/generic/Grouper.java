@@ -5,8 +5,9 @@ import uk.gov.register.derivation.core.PartialEntity;
 import uk.gov.register.derivation.generic.groupings.Grouping;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface Grouper {
-    void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, String> allItems, Map<String, PartialEntity> stateMap, Grouping grouping);
+    void group(Collection<Entry> entries, int currentMaxEntryNumber, Map<String, List<String>> allItems, Map<String, PartialEntity> stateMap, Grouping grouping);
 }

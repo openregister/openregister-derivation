@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException, ParseException {
@@ -41,8 +38,15 @@ public class Main {
                 stateEntities = parser.parse(stateStream);
             }
 
-            List<String> filters = Arrays.asList(commandLine.getOptionValue("filters").split(","));
-            List<String> groupings = Arrays.asList(commandLine.getOptionValue("groupings").split(","));
+            List<String> filters = new ArrayList<>();
+            if (commandLine.hasOption("filters")) {
+                filters = Arrays.asList(commandLine.getOptionValue("filters").split(","));
+            }
+
+            List<String> groupings = new ArrayList<>();
+            if (commandLine.hasOption("groupings")) {
+                groupings = Arrays.asList(commandLine.getOptionValue("groupings").split(","));
+            }
 
             Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities, filters, groupings);
 

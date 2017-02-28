@@ -67,12 +67,20 @@ public class GenericTransformer implements RegisterTransformer {
         final Map<String, PartialEntity> stateMap = state.stream().collect(toMap(PartialEntity::getKey, identity()));
 
         Map<Integer, Entry> entries = updates.stream().flatMap(e -> e.getEntries().stream()).collect(Collectors.toMap(e -> e.getEntryNumber(), e -> e));
-        Map<String, String> allItems = new HashMap<>();
+        Map<String, List<String>> allItems = new HashMap<>();
         state.stream().forEach(pe -> {
             Entry record = pe.getRecord().get();
             List<String> itemsInList = (List<String>) record.getItem().getFields().get(COUNTRIES);
 
-            itemsInList.forEach(key -> allItems.put(key, pe.getKey()));
+//            itemsInList.forEach(key -> allItems.put(key, pe.getKey()));
+
+            itemsInList.forEach(key -> {
+                if (!allItems.containsKey(key)) {
+                    allItems.put(key, new ArrayList<>());
+                }
+
+                allItems.get(key).add(pe.getKey());
+            });
         });
 
         grouper.group(entries.values(), currentMaxEntryNumber(state), allItems, stateMap, grouping);
