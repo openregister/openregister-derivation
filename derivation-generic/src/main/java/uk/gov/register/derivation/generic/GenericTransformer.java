@@ -14,8 +14,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 public class GenericTransformer implements RegisterTransformer {
-    private static final String COUNTRIES = "countries";
-
     private final Map<String, Filter> allFilters;
     private final Map<String, Grouping> allGroupings;
     private final Grouper grouper;
@@ -28,25 +26,20 @@ public class GenericTransformer implements RegisterTransformer {
     }
 
     @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> filters, List<String> groupings) {
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> transformationOptions) {
         // Apply function to remove countries with end-date
-        Set<PartialEntity> filteredEntities = newPartialEntities;
-        for (String filter : filters) {
-            if (!allFilters.containsKey(filter)) {
-                throw new RuntimeException("Unknown filter specified: " + filter);
+        Set<PartialEntity> transformedEntities = newPartialEntities;
+
+        for (String option : transformationOptions) {
+            if (allFilters.containsKey(option)) {
+                transformedEntities = filterEntities(transformedEntities, state, allFilters.get(option));
             }
-
-            filteredEntities = filterEntities(filteredEntities, state, allFilters.get(filter));
-        }
-
-        // Apply function to group countries by code
-        Set<PartialEntity> transformedEntities = filteredEntities;
-        for (String grouping : groupings) {
-            if (!allGroupings.containsKey(grouping)) {
-                throw new RuntimeException("Unknown grouping specified: " + grouping);
+            else if (allGroupings.containsKey(option)) {
+                transformedEntities = groupEntities(transformedEntities, state, allGroupings.get(option));
             }
-
-            transformedEntities = groupEntities(filteredEntities, state, allGroupings.get(grouping));
+            else {
+                throw new RuntimeException("The specified transformation option does not exist");
+            }
         }
 
         // Return result

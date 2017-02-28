@@ -38,17 +38,9 @@ public class Main {
                 stateEntities = parser.parse(stateStream);
             }
 
-            List<String> filters = new ArrayList<>();
-            if (commandLine.hasOption("filters")) {
-                filters = Arrays.asList(commandLine.getOptionValue("filters").split(","));
-            }
+            List<String> transformationOptions = Arrays.asList(commandLine.getOptionValue("pipe").split(","));
 
-            List<String> groupings = new ArrayList<>();
-            if (commandLine.hasOption("groupings")) {
-                groupings = Arrays.asList(commandLine.getOptionValue("groupings").split(","));
-            }
-
-            Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities, filters, groupings);
+            Set<PartialEntity> transformed = transformer.transform(updateEntities, stateEntities, transformationOptions);
 
             String rsf = rsfCreator.serializeAsRsf(transformed);
 
@@ -64,15 +56,10 @@ public class Main {
         options.addOption("u", "updates", true, "RSF file containing updates");
         options.addOption("s", "state", true, "RSF state file");
 
-        Option filtersOpt = new Option("filters", true, "Specifies the filters to apply\nOptions:\n- currentCountries");
+        Option filtersOpt = new Option("p", "pipe", true, "Specifies a pipeline of filters and groupings to apply to the input state and updates");
         filtersOpt.setArgs(1);
 
-        Option groupersOpt = new Option("groupings", true,
-                "Specifies the groupings to apply\nOptions:\n- countriesByCode\n- countriesByFirstThreeLetters");
-        groupersOpt.setArgs(1);
-
         options.addOption(filtersOpt);
-        options.addOption(groupersOpt);
 
         CommandLineParser parser = new DefaultParser();
 

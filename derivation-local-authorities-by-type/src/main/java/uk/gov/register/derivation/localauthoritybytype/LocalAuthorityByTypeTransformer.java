@@ -117,7 +117,7 @@ public class LocalAuthorityByTypeTransformer implements RegisterTransformer {
     }
 
     @Override
-    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> filters, List<String> groupers) {
+    public Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state, List<String> transformationOptions) {
         return null;
     }
 }
