@@ -28,6 +28,9 @@ public class GenericGrouper implements Grouper {
             String groupItem = (String) entry.getItem().getFields().get(grouping.getItemField());
 
             List<String> groupKeys = grouping.calculateKeys(entry.getItem());
+            if (groupKeys == null || groupKeys.isEmpty()) {
+                groupKeys = Arrays.asList(groupKey);
+            }
 
             groupKeys.forEach(subKey -> {
                 if (allItems.containsKey(subKey) && allItems.get(subKey).contains(groupKey)) {
@@ -37,7 +40,6 @@ public class GenericGrouper implements Grouper {
 
                 if (allItems.containsKey(subKey) && stateMap.containsKey(groupItem)) {
                     // Item has moved groups
-//                    PartialEntity pe = stateMap.get(allItems.get(groupItem));
                     PartialEntity pe = stateMap.get(groupItem);
                     List<String> groupItems = (List<String>) pe.getRecord().orElseThrow(IllegalStateException::new)
                             .getItem().getFields().get(grouping.getItemFieldName());
@@ -48,12 +50,12 @@ public class GenericGrouper implements Grouper {
                     pe.getEntries().add(removingEntry);
                 }
 
-                if (!stateMap.containsKey(groupKey)) {
-                    stateMap.put(groupKey, createGroupingEntity(groupKey, grouping));
+                if (!stateMap.containsKey(subKey)) {
+                    stateMap.put(subKey, createGroupingEntity(subKey, grouping));
                 }
 
-                List<String> groupItems = stateMap.get(groupKey).getRecord().isPresent()
-                        ? (List<String>) stateMap.get(groupKey).getRecord().get().getItem().getFields().get(grouping.getItemFieldName())
+                List<String> groupItems = stateMap.get(subKey).getRecord().isPresent()
+                        ? (List<String>) stateMap.get(subKey).getRecord().get().getItem().getFields().get(grouping.getItemFieldName())
                         : new ArrayList<>();
 
                 if (groupItems == null) {
@@ -63,7 +65,7 @@ public class GenericGrouper implements Grouper {
                 Entry newEntry = createAddingEntry(groupKey, subKey, grouping, allItems, groupItems,
                         entry.getEntryNumber() + currentMaxEntryNumber + rollingNumber.get());
 
-                stateMap.get(groupKey).getEntries().add(newEntry);
+                stateMap.get(subKey).getEntries().add(newEntry);
             });
         });
     }
