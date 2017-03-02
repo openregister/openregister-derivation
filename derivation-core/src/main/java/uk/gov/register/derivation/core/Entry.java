@@ -14,22 +14,22 @@ public class Entry {
 
     private String itemHash;
 
-    private int sequenceNumber;
+    private int entryNumber;
 
     private Item item;
 
-    public Entry(int sequenceNumber, Instant timestamp, String itemHash) {
+    public Entry(int entryNumber, Instant timestamp, String itemHash) {
         this.timestamp = timestamp;
         this.itemHash = itemHash;
-        this.sequenceNumber = sequenceNumber;
+        this.entryNumber = entryNumber;
     }
 
     // used by Jackson
-    public Entry(@JsonProperty("sequenceNumber") int sequenceNumber, @JsonProperty("timestamp") String timestamp,
+    public Entry(@JsonProperty("entryNumber") int entryNumber, @JsonProperty("timestamp") String timestamp,
                  @JsonProperty("itemHash") String itemHash) {
         this.timestamp = Instant.parse(timestamp);
         this.itemHash = itemHash;
-        this.sequenceNumber = sequenceNumber;
+        this.entryNumber = entryNumber;
     }
 
     @JsonIgnore
@@ -46,8 +46,8 @@ public class Entry {
         return itemHash;
     }
 
-    public int getSequenceNumber() {
-        return sequenceNumber;
+    public int getEntryNumber() {
+        return entryNumber;
     }
 
     public Item getItem() {
@@ -63,8 +63,10 @@ public class Entry {
         return "Entry{" +
                 "timestamp=" + timestamp +
                 ", itemHash='" + itemHash + '\'' +
-                ", sequenceNumber=" + sequenceNumber +
+                ", entryNumber=" + entryNumber +
                 ", item=" + item +
                 '}';
     }
+
+
 }

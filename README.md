@@ -7,6 +7,8 @@ Home of register derivations
 
 - Java 1.8+
 
+# Command Line Application
+
 # Description
 
 Currently a Java command line application which reads an RSF file and stores a JSON representation of the Registers
@@ -27,3 +29,23 @@ For example:
     cd derivation-cli/build/libs
     java -jar derivation-cli-all.jar /tmp/countries.rsf openregister.derivation derivation.json
 
+# Web Application
+
+This is a simplified version of the Register application.
+
+### Building
+
+	cd [project root]
+    gradle orj-lite:shadowJar
+    
+### Running
+
+    cd orj-lite
+    java -jar build/libs/orj-lite-all.jar server orj-lite.yaml
+    
+The application has no persistent data store. You need to load some register data into memory using:
+
+    ./load-local-authority-rsf.sh 
+    
+   
+   
