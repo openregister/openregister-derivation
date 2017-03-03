@@ -1,4 +1,4 @@
-package uk.gov.register.derivation.web.resources;
+package uk.gov.register.derivation.web.serialization;
 
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.PartialEntity;
@@ -15,11 +15,10 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Set;
 
 @Provider
 @Consumes("application/uk-gov-rsf")
-public class RegisterMessageBodyReader implements MessageBodyReader<PartialEntitySetWrapper> {
+public class RegisterMessageBodyReader implements MessageBodyReader<PartialEntitiesWrapper> {
 
     @Override
     public boolean isReadable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -27,9 +26,9 @@ public class RegisterMessageBodyReader implements MessageBodyReader<PartialEntit
     }
 
     @Override
-    public PartialEntitySetWrapper readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+    public PartialEntitiesWrapper readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         RsfParser parser = new RsfParser();
         Collection<PartialEntity<Entry>> entities = parser.parse(entityStream);
-        return new PartialEntitySetWrapper(entities);
+        return new PartialEntitiesWrapper(entities);
     }
 }

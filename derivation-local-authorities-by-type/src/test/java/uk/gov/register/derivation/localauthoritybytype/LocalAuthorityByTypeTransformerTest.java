@@ -1,21 +1,20 @@
-package uk.gov.register.localauthoritybytype;
+package uk.gov.register.derivation.localauthoritybytype;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.register.derivation.core.DerivationEntry;
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.Item;
-import uk.gov.register.derivation.core.DerivationEntry;
 import uk.gov.register.derivation.core.PartialEntity;
-import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -35,10 +34,10 @@ public class LocalAuthorityByTypeTransformerTest {
         PartialEntity<DerivationEntry> newStateEntity1 = newState.iterator().next();
         assertThat(newStateEntity1.getKey(), is("NMD"));
         assertThat(newStateEntity1.getEntries().size(), is(1));
-        assertThat(newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("NMD"));
-        assertTrue(newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authorities") instanceof List);
-        List<String> localAuthorities = (List<String>) newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authorities");
-        assertThat(localAuthorities.get(0), is("LEE"));
+        Item item = newStateEntity1.getEntries().get(0).getItems().iterator().next();
+        assertThat(item.getFields().get("local-authority-type"), is("NMD"));
+        String localAuthority = (String) item.getFields().get("local-authority-eng");
+        assertThat(localAuthority, is("LEE"));
     }
 
     @Test
@@ -55,8 +54,13 @@ public class LocalAuthorityByTypeTransformerTest {
         PartialEntity<DerivationEntry> newStateEntity1 = newState.iterator().next();
         assertThat(newStateEntity1.getKey(), is("NMD"));
         assertThat(newStateEntity1.getEntries().size(), is(2));
-        assertThat(newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("NMD"));
-        List<String> localAuthorities1 = (List<String>) newStateEntity1.getEntries().get(1).getItem().getFields().get("local-authorities");
+        Item item = newStateEntity1.getEntries().get(0).getItems().iterator().next();
+        assertThat(item.getFields().get("local-authority-type"), is("NMD"));
+        //
+        Set<Item> items = newStateEntity1.getEntries().get(1).getItems();
+        assertThat(items.size(), is(2));
+        List<String> localAuthorities1 = items.stream().map(i -> (String) (i.getFields().get("local-authority-eng")))
+                .collect(toList());
         assertThat(localAuthorities1, hasItems("LEE", "HAS"));
     }
 
@@ -67,17 +71,20 @@ public class LocalAuthorityByTypeTransformerTest {
         update.add(createEntity("HAS", "NMD", "Hastings"));
 
         Collection<PartialEntity<DerivationEntry>> state = new HashSet<>();
-        state.add(createDerivationEntity("LEE", "NMD"));
+        state.add(createDerivationEntity("LEE", "NMD", "Lewes"));
 
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
         Collection<PartialEntity<DerivationEntry>> newState = transformer.transform(update, state);
         PartialEntity<DerivationEntry> newStateEntity1 = newState.iterator().next();
+
         assertThat(newStateEntity1.getKey(), is("NMD"));
         assertThat(newStateEntity1.getEntries().size(), is(2));
-        assertThat(newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("NMD"));
-        List<String> localAuthorities0 = (List<String>) newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authorities");
-        assertThat(localAuthorities0, hasItems("LEE"));
-        List<String> localAuthorities1 = (List<String>) newStateEntity1.getEntries().get(1).getItem().getFields().get("local-authorities");
+        assertThat(newStateEntity1.getEntries().get(0).getItems().iterator().next().getFields().get("local-authority-type"), is("NMD"));
+        assertThat(newStateEntity1.getEntries().get(0).getItems().iterator().next().getFields().get("local-authority-eng"), is("LEE"));
+
+        Set<Item> items = newStateEntity1.getEntries().get(1).getItems();
+        List<String> localAuthorities1 = items.stream().map(i -> (String) (i.getFields().get("local-authority-eng")))
+                .collect(toList());
         assertThat(localAuthorities1, hasItems("LEE", "HAS"));
     }
 
@@ -88,7 +95,7 @@ public class LocalAuthorityByTypeTransformerTest {
         update.add(createEntity("ESS", "CTY", "Essex"));
 
         Collection<PartialEntity<DerivationEntry>> state = new HashSet<>();
-        state.add(createDerivationEntity("LEE", "NMD"));
+        state.add(createDerivationEntity("LEE", "NMD", "Lewes"));
 
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
         Collection<PartialEntity<DerivationEntry>> newState = transformer.transform(update, state);
@@ -100,17 +107,18 @@ public class LocalAuthorityByTypeTransformerTest {
         PartialEntity<DerivationEntry> nmdEntity = entityMap.get("NMD");
         assertThat(nmdEntity.getKey(), is("NMD"));
         assertThat(nmdEntity.getEntries().size(), is(1));
-        assertThat(nmdEntity.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("NMD"));
-        List<String> localAuthoritiesNmd = (List<String>) nmdEntity.getEntries().get(0).getItem().getFields().get("local-authorities");
-        assertThat(localAuthoritiesNmd, hasItems("LEE"));
+
+        assertThat(nmdEntity.getEntries().get(0).getItems().iterator().next().getFields().get("local-authority-type"), is("NMD"));
+        Item item = nmdEntity.getEntries().get(0).getItems().iterator().next();
+        assertThat(item.getFields().get("local-authority-eng"), is("LEE"));
 
         assertTrue(entityMap.containsKey("CTY"));
         PartialEntity<DerivationEntry> ctyEntity = entityMap.get("CTY");
         assertThat(ctyEntity.getKey(), is("CTY"));
         assertThat(ctyEntity.getEntries().size(), is(1));
-        assertThat(ctyEntity.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("CTY"));
-        List<String> localAuthoritiesCty = (List<String>) ctyEntity.getEntries().get(0).getItem().getFields().get("local-authorities");
-        assertThat(localAuthoritiesCty, hasItems("ESS"));
+
+        Item item2 = nmdEntity.getEntries().get(0).getItems().iterator().next();
+        assertThat(item2.getFields().get("local-authority-eng"), is("LEE"));
     }
 
     @Test
@@ -120,7 +128,7 @@ public class LocalAuthorityByTypeTransformerTest {
         update.add(createEntity("LEE", "NMD", "New Lewes"));
 
         Collection<PartialEntity<DerivationEntry>> state = new HashSet<>();
-        state.add(createDerivationEntity("LEE", "NMD"));
+        state.add(createDerivationEntity("LEE", "NMD", "Lewes"));
 
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
         Collection<PartialEntity<DerivationEntry>> newState = transformer.transform(update, state);
@@ -128,9 +136,6 @@ public class LocalAuthorityByTypeTransformerTest {
         PartialEntity<DerivationEntry> newStateEntity1 = newState.iterator().next();
         assertThat(newStateEntity1.getKey(), is("NMD"));
         assertThat(newStateEntity1.getEntries().size(), is(1));
-        assertThat(newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authority-type"), is("NMD"));
-        List<String> localAuthorities = (List<String>) newStateEntity1.getEntries().get(0).getItem().getFields().get("local-authorities");
-        assertThat(localAuthorities, hasItems("LEE"));
     }
 
     @Test
@@ -140,8 +145,8 @@ public class LocalAuthorityByTypeTransformerTest {
         update.add(createEntity("ESS", "NMD", "Essex"));
 
         Collection<PartialEntity<DerivationEntry>> state = new HashSet<>();
-        state.add(createDerivationEntity("LEE", "NMD"));
-        state.add(createDerivationEntity("ESS", "CTY"));
+        state.add(createDerivationEntity("LEE", "NMD", "Lewes"));
+        state.add(createDerivationEntity("ESS", "CTY", "Essex"));
 
         LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
         Collection<PartialEntity<DerivationEntry>> newState = transformer.transform(update, state);
@@ -153,59 +158,47 @@ public class LocalAuthorityByTypeTransformerTest {
         PartialEntity<DerivationEntry> nmdEntity = entityMap.get("NMD");
         assertThat(nmdEntity.getKey(), is("NMD"));
         assertThat(nmdEntity.getEntries().size(), is(2));
-        assertThat(nmdEntity.getEntries().get(1).getItem().getFields().get("local-authority-type"), is("NMD"));
-        List<String> localAuthoritiesNmd = (List<String>) nmdEntity.getEntries().get(1).getItem().getFields().get("local-authorities");
-        assertThat(localAuthoritiesNmd, hasItems("LEE","ESS"));
+
+        List<String> localAuthNames = nmdEntity.getEntries().get(1).getItems().stream().map(i -> (String) i.getFields()
+                .get("local-authority-eng")).collect(Collectors.toList());
+
+        assertThat(localAuthNames, hasItems("LEE", "ESS"));
 
         assertTrue(entityMap.containsKey("CTY"));
         PartialEntity<DerivationEntry> ctyEntity = entityMap.get("CTY");
         assertThat(ctyEntity.getKey(), is("CTY"));
         assertThat(ctyEntity.getEntries().size(), is(2));
-        assertThat(ctyEntity.getEntries().get(1).getItem().getFields().get("local-authority-type"), is("CTY"));
-        List<String> localAuthoritiesCty = (List<String>) ctyEntity.getEntries().get(1).getItem().getFields().get("local-authorities");
-        assertThat(localAuthoritiesCty, is(empty()));
+
+        List<String> localAuthNamesCty = ctyEntity.getEntries().get(1).getItems().stream().map(i -> (String) i.getFields()
+                .get("local-authority-eng")).collect(Collectors.toList());
+
+        assertThat(localAuthNames, hasItems("LEE"));
     }
 
-    @Test
-    public void shouldComputeItemHash(){
-        Collection<PartialEntity<Entry>> update = Collections.singleton(createEntity("LEE", "NMD", "Lewes"));
-        Collection<PartialEntity<DerivationEntry>> state = Collections.emptySet();
-        LocalAuthorityByTypeTransformer transformer = new LocalAuthorityByTypeTransformer();
-        Collection<PartialEntity<DerivationEntry>> newState = transformer.transform(update, state);
-        PartialEntity<DerivationEntry> newStateEntity1 = newState.iterator().next();
-
-        // fields must be in alphabetical order and no whitespace
-        String expected = "sha-256:" + DigestUtils.sha256Hex("{\"local-authorities\":[\"LEE\"],\"local-authority-type\":\"NMD\"}");
-        String itemHash = newStateEntity1.getEntries().get(0).getItemHash();
-
-        assertThat(itemHash, is(expected));
-    }
-
-    private PartialEntity<DerivationEntry> createDerivationEntity(String localAuthorityKey, String localAuthorityTypeKey) {
-        PartialEntity partialEntity = new PartialEntity(localAuthorityTypeKey);
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("local-authority-type", localAuthorityTypeKey);
-        List<String> localAuthorityKeys = new LinkedList<>();
-        localAuthorityKeys.add(localAuthorityKey);
-        fields.put("local-authorities", localAuthorityKeys);
-        Item item = new Item(fields);
-        DerivationEntry entry = new DerivationEntry(1, Instant.EPOCH, "sha-256:1");
-        entry.setItem(item);
+    private PartialEntity<DerivationEntry> createDerivationEntity(String localAuthorityKey, String localAuthorityTypeKey, String name) {
+        PartialEntity<DerivationEntry> partialEntity = new PartialEntity<>(localAuthorityTypeKey);
+        Item item = getItem(localAuthorityKey, localAuthorityTypeKey, name);
+        DerivationEntry entry = new DerivationEntry(1, Instant.EPOCH);
+        entry.getItems().add(item);
         partialEntity.getEntries().add(entry);
         return partialEntity;
     }
 
     private PartialEntity<Entry> createEntity(String key, String authorityType, String name) {
         PartialEntity partialEntity = new PartialEntity(key);
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("local-authority-eng", key);
-        fields.put("local-authority-type", authorityType);
-        fields.put("name", name);
-        Item item = new Item(fields);
+        Item item = getItem(key, authorityType, name);
         Entry entry = new Entry(1, Instant.EPOCH, "sha-256:1");
         entry.setItem(item);
         partialEntity.getEntries().add(entry);
         return partialEntity;
+    }
+
+    private Item getItem(String key, String authorityType, String name) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("local-authority-eng", key);
+        fields.put("local-authority-type", authorityType);
+        fields.put("name", name);
+        return new Item(fields);
     }
 
 }

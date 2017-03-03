@@ -1,18 +1,18 @@
 package uk.gov.register.derivation.web;
 
 import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import uk.gov.register.derivation.core.DerivationEntry;
 import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 import uk.gov.register.derivation.web.health.BogusHealthCheck;
 import uk.gov.register.derivation.web.repo.EntityStore;
+import uk.gov.register.derivation.web.resources.DerivationResource;
 import uk.gov.register.derivation.web.resources.RecordResource;
 import uk.gov.register.derivation.web.resources.RecordsResource;
-import uk.gov.register.derivation.web.resources.RegisterMessageBodyReader;
+import uk.gov.register.derivation.web.serialization.RegisterMessageBodyReader;
 import uk.gov.register.derivation.web.service.UpdateService;
 
 import javax.ws.rs.ext.MessageBodyReader;
@@ -55,6 +55,9 @@ public class OrjLiteApplication extends Application<OrjLiteConfig> {
 
             RecordResource recordResource = new RecordResource(registerStore);
             environment.jersey().register(recordResource);
+
+            DerivationResource derivationResource = new DerivationResource(derivationStore);
+            environment.jersey().register(derivationResource);
         }
 
     }

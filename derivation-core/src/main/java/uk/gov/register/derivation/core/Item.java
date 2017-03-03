@@ -15,4 +15,11 @@ public class Item {
     public Map<String, Object> getFields() {
         return fields;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "fields=" + fields +
+                '}';
+    }
 }

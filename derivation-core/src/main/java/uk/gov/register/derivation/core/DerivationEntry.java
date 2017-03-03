@@ -1,45 +1,43 @@
 package uk.gov.register.derivation.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.UncheckedIOException;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DerivationEntry extends AbstractEntry {
-    private String itemHash;
 
-    private Item item;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public DerivationEntry(int entryNumber, Instant timestamp, String itemHash) {
+    private Set<Item> items;
+
+    public DerivationEntry(int entryNumber, Instant timestamp) {
         super(timestamp, entryNumber);
-        this.itemHash = itemHash;
+        this.items = new HashSet<>();
     }
 
     // used by Jackson
-    public DerivationEntry(@JsonProperty("entryNumber") int entryNumber, @JsonProperty("timestamp") String timestamp,
-                           @JsonProperty("itemHash") String itemHash) {
+    public DerivationEntry(@JsonProperty("entryNumber") int entryNumber, @JsonProperty("timestamp") String timestamp) {
         super(timestamp, entryNumber);
-        this.itemHash = itemHash;
     }
 
-    public String getItemHash() {
-        return itemHash;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
+    public Set<Item> getItems() {
+        return items;
     }
 
     @Override
     public String toString() {
         return "Entry{" +
                 "timestamp=" + getTimestamp() +
-                ", itemHash='" + itemHash + '\'' +
                 ", entryNumber=" + getEntryNumber() +
-                ", item=" + item +
+                ", item=" + items +
                 '}';
     }
+
 }

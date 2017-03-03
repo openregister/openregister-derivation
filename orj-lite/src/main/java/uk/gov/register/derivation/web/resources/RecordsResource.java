@@ -1,6 +1,7 @@
 package uk.gov.register.derivation.web.resources;
 
 import uk.gov.register.derivation.web.repo.EntityStore;
+import uk.gov.register.derivation.web.serialization.PartialEntitiesWrapper;
 import uk.gov.register.derivation.web.service.UpdateService;
 import uk.gov.register.derivation.web.util.DataViews;
 
@@ -32,8 +33,8 @@ public class RecordsResource {
     @PermitAll
     @Consumes("application/uk-gov-rsf")
     @Path("/load-rsf")
-    public Response loadRsf(PartialEntitySetWrapper updateEntities) {
-        updateService.update(updateEntities.entitySet);
+    public Response loadRsf(PartialEntitiesWrapper updateEntities) {
+        updateService.update(updateEntities.entities);
         return Response.accepted().build();
     }
 }

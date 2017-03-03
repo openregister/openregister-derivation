@@ -26,6 +26,10 @@ public class EntityStore<T extends AbstractEntry> {
         }
     }
 
+    public void clear(){
+        entitiesByKey.clear();
+    }
+
     public Optional<PartialEntity<T>> findEntity(String key) {
         return Optional.ofNullable(entitiesByKey.get(key));
     }

@@ -24,6 +24,7 @@ public class UpdateService {
         entities.forEach(entity -> registerStore.merge(entity));
         Collection<PartialEntity<DerivationEntry>> derivationState = derivationStore.allEntities();
         Collection<PartialEntity<DerivationEntry>> derivationUpdate = registerTransformer.transform(entities, derivationState);
+        derivationState.clear();
         derivationUpdate.forEach( entity -> derivationStore.merge(entity));
     }
 }
