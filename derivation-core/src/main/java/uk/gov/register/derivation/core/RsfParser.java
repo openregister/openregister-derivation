@@ -23,7 +23,7 @@ public class RsfParser {
     private static ObjectMapper MAPPER = new ObjectMapper();
     private static TypeReference<HashMap<String,Object>> TYPEREF = new TypeReference<HashMap<String,Object>>() {};
 
-    public Set<PartialEntity> parse(InputStream rsfStream) {
+    public Collection<PartialEntity<Entry>> parse(InputStream rsfStream) {
         final Map<String, Item> itemsByHash = new HashMap<>();
         final Map<String, List<Entry>> entriesByKey = new HashMap<>();
         AtomicInteger entryNumber = new AtomicInteger(startingEntryNumber());
@@ -33,8 +33,8 @@ public class RsfParser {
 
     }
 
-    private Set<PartialEntity> collectToEntity(Map<String, Item> itemsByHash, Map<String, List<Entry>> entriesByKey) {
-        final Map<String, PartialEntity> entities = new HashMap<>();
+    private Collection<PartialEntity<Entry>> collectToEntity(Map<String, Item> itemsByHash, Map<String, List<Entry>> entriesByKey) {
+        final Map<String, PartialEntity<Entry>> entities = new HashMap<>();
 
         entriesByKey.entrySet().stream().forEach(kv -> {
             List<Entry> entries = kv.getValue().stream().map(entry -> {
@@ -47,7 +47,7 @@ public class RsfParser {
             }).collect(Collectors.toList());
 
             if (!entities.containsKey(kv.getKey())) {
-                entities.put(kv.getKey(), new PartialEntity(kv.getKey()));
+                entities.put(kv.getKey(), new PartialEntity<Entry>(kv.getKey()));
             }
             entities.get(kv.getKey()).getEntries().addAll(entries);
 

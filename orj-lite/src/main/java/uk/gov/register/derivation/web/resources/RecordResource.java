@@ -1,5 +1,6 @@
 package uk.gov.register.derivation.web.resources;
 
+import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.web.repo.EntityStore;
 import uk.gov.register.derivation.web.util.DataViews;
 
@@ -14,9 +15,9 @@ import java.util.Map;
 @Path("/record")
 @Produces(MediaType.APPLICATION_JSON)
 public class RecordResource {
-    private final EntityStore entityStore;
+    private final EntityStore<Entry> entityStore;
 
-    public RecordResource(EntityStore entityStore) {
+    public RecordResource(EntityStore<Entry> entityStore) {
         this.entityStore = entityStore;
     }
 

@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -29,13 +30,13 @@ public class RsfParserTest {
     @Test
     public void shouldParseEntityWithSingleEntry() throws Exception {
         InputStream rdfStream = Files.newInputStream(Paths.get("src/test/resources", "countries.rsf"));
-        Set<PartialEntity> entities = parser.parse(rdfStream);
+        Collection<PartialEntity<Entry>> entities = parser.parse(rdfStream);
         System.out.println( entities );
         assertThat(entities.size(), is(3));
 
-        Map<String, PartialEntity> entityMap = getEntityMap(entities);
+        Map<String, PartialEntity<Entry>> entityMap = getEntityMap(entities);
         assertTrue( entityMap.containsKey("LS"));
-        PartialEntity entity = entityMap.get("LS");
+        PartialEntity<Entry> entity = entityMap.get("LS");
         assertThat(entity.getEntries().size(), is(1));
         assertThat(entity.getEntries().get(0).getItem(), is(notNullValue()));
         assertThat(entity.getEntries().get(0).getItem().getFields(), is(notNullValue()) );
@@ -47,13 +48,13 @@ public class RsfParserTest {
     @Test
     public void latestEntryShouldBeLastInList() throws Exception {
         InputStream rdfStream = Files.newInputStream(Paths.get("src/test/resources", "countries.rsf"));
-        Set<PartialEntity> entities = parser.parse(rdfStream);
+        Collection<PartialEntity<Entry>> entities = parser.parse(rdfStream);
         System.out.println( entities );
         assertThat(entities.size(), is(3));
 
-        Map<String, PartialEntity> entityMap = getEntityMap(entities);
+        Map<String, PartialEntity<Entry>> entityMap = getEntityMap(entities);
         assertTrue( entityMap.containsKey("CZ"));
-        PartialEntity entity = entityMap.get("CZ");
+        PartialEntity<Entry> entity = entityMap.get("CZ");
         assertThat(entity.getEntries().size(), is(2));
         assertThat(entity.getEntries().get(1).getItem(), is(notNullValue()));
         assertThat(entity.getEntries().get(1).getItem().getFields(), is(notNullValue()) );
@@ -83,7 +84,7 @@ public class RsfParserTest {
         }
     }
 
-    private Map<String,PartialEntity> getEntityMap(Set<PartialEntity> entities){
+    private Map<String,PartialEntity<Entry>> getEntityMap(Collection<PartialEntity<Entry>> entities){
         return entities.stream().collect(Collectors.toMap(PartialEntity::getKey, Function.identity()));
     }
 

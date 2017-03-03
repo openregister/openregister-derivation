@@ -6,11 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class PartialEntity {
+public class PartialEntity<T extends AbstractEntry> {
 
     private final String key;
 
-    private final List<Entry> entries;
+    private final List<T> entries;
 
     public PartialEntity(@JsonProperty("key") String key) {
         this.key = key;
@@ -21,11 +21,11 @@ public class PartialEntity {
         return key;
     }
 
-    public List<Entry> getEntries() {
+    public List<T> getEntries() {
         return entries;
     }
 
-    public Optional<Entry> getRecord(){
+    public Optional<T> getRecord(){
         if ( entries.size() > 0){
             return Optional.of(entries.get(entries.size() - 1));
         } else {

@@ -1,7 +1,9 @@
 package uk.gov.register.derivation.web.resources;
 
+import uk.gov.register.derivation.core.Entry;
 import uk.gov.register.derivation.core.PartialEntity;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -9,9 +11,9 @@ import java.util.Set;
  */
 class PartialEntitySetWrapper {
 
-    final Set<PartialEntity> entitySet;
+    final Collection<PartialEntity<Entry>> entitySet;
 
-    PartialEntitySetWrapper(Set<PartialEntity> entitySet) {
+    PartialEntitySetWrapper(Collection<PartialEntity<Entry>> entitySet) {
         this.entitySet = entitySet;
     }
 

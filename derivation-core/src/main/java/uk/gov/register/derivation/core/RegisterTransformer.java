@@ -1,7 +1,8 @@
 package uk.gov.register.derivation.core;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface RegisterTransformer {
-    Set<PartialEntity> transform(Set<PartialEntity> newPartialEntities, Set<PartialEntity> state);
+    Collection<PartialEntity<DerivationEntry>> transform(Collection<PartialEntity<Entry>> newPartialEntities,
+                                                         Collection<PartialEntity<DerivationEntry>> state);
 }

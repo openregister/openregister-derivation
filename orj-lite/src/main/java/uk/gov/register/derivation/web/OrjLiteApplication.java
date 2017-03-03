@@ -4,11 +4,16 @@ import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 
 import io.dropwizard.setup.Bootstrap;
+import uk.gov.register.derivation.core.DerivationEntry;
+import uk.gov.register.derivation.core.Entry;
+import uk.gov.register.derivation.core.RegisterTransformer;
+import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 import uk.gov.register.derivation.web.health.BogusHealthCheck;
 import uk.gov.register.derivation.web.repo.EntityStore;
 import uk.gov.register.derivation.web.resources.RecordResource;
 import uk.gov.register.derivation.web.resources.RecordsResource;
 import uk.gov.register.derivation.web.resources.RegisterMessageBodyReader;
+import uk.gov.register.derivation.web.service.UpdateService;
 
 import javax.ws.rs.ext.MessageBodyReader;
 
@@ -38,12 +43,17 @@ public class OrjLiteApplication extends Application<OrjLiteConfig> {
             MessageBodyReader registerMessageBodyReader = new RegisterMessageBodyReader();
             environment.jersey().register(registerMessageBodyReader);
 
-            EntityStore entityStore = new EntityStore();
+            EntityStore<Entry> registerStore = new EntityStore<>();
+            EntityStore<DerivationEntry> derivationStore = new EntityStore<>();
 
-            RecordsResource recordsResource = new RecordsResource(entityStore);
+            RegisterTransformer registerTransformer = new LocalAuthorityByTypeTransformer();
+
+            UpdateService updateService = new UpdateService(registerStore, derivationStore, registerTransformer);
+
+            RecordsResource recordsResource = new RecordsResource(registerStore, updateService);
             environment.jersey().register(recordsResource);
 
-            RecordResource recordResource = new RecordResource(entityStore);
+            RecordResource recordResource = new RecordResource(registerStore);
             environment.jersey().register(recordResource);
         }
 

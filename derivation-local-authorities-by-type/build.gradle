@@ -1,0 +1,7 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':derivation-core' )
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+}

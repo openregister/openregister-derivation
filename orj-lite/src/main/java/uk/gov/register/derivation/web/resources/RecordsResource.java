@@ -1,6 +1,7 @@
 package uk.gov.register.derivation.web.resources;
 
 import uk.gov.register.derivation.web.repo.EntityStore;
+import uk.gov.register.derivation.web.service.UpdateService;
 import uk.gov.register.derivation.web.util.DataViews;
 
 import javax.annotation.security.PermitAll;
@@ -14,9 +15,11 @@ import java.util.Map;
 public class RecordsResource {
 
     private final EntityStore entityStore;
+    private final UpdateService updateService;
 
-    public RecordsResource(EntityStore entityStore) {
+    public RecordsResource(EntityStore entityStore, UpdateService updateService) {
         this.entityStore = entityStore;
+        this.updateService = updateService;
     }
 
     @GET
@@ -30,7 +33,7 @@ public class RecordsResource {
     @Consumes("application/uk-gov-rsf")
     @Path("/load-rsf")
     public Response loadRsf(PartialEntitySetWrapper updateEntities) {
-        updateEntities.entitySet.forEach(entity -> entityStore.store(entity));
+        updateService.update(updateEntities.entitySet);
         return Response.accepted().build();
     }
 }

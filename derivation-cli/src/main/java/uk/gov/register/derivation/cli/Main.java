@@ -5,13 +5,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import uk.gov.register.derivation.core.PartialEntity;
+import uk.gov.register.derivation.core.RegisterTransformer;
 import uk.gov.register.derivation.core.RsfParser;
-import uk.gov.register.derivation.currentcountries.CurrentCountryFilter;
+import uk.gov.register.derivation.localauthoritybytype.LocalAuthorityByTypeTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,8 +35,8 @@ public class Main {
                 partialEntities = JsonSerializer.deserialize(objectContent, new TypeReference<Set<PartialEntity>>() {});
             }
 
-            CurrentCountryFilter transformer = injector.getInstance(CurrentCountryFilter.class);
-            Set<PartialEntity> transformed = transformer.transform(entities, partialEntities);
+            RegisterTransformer transformer = injector.getInstance(LocalAuthorityByTypeTransformer.class);
+            Collection<PartialEntity> transformed = transformer.transform(entities, partialEntities);
 
             String jsonResult = JsonSerializer.serialize(transformed);
             amazonS3.putObject(bucketName, objectName, jsonResult);

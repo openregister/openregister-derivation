@@ -4,20 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 
-public class Entry extends AbstractEntry {
-
+public class DerivationEntry extends AbstractEntry {
     private String itemHash;
 
     private Item item;
 
-    public Entry(int entryNumber, Instant timestamp, String itemHash) {
+    public DerivationEntry(int entryNumber, Instant timestamp, String itemHash) {
         super(timestamp, entryNumber);
         this.itemHash = itemHash;
     }
 
     // used by Jackson
-    public Entry(@JsonProperty("entryNumber") int entryNumber, @JsonProperty("timestamp") String timestamp,
-                 @JsonProperty("itemHash") String itemHash) {
+    public DerivationEntry(@JsonProperty("entryNumber") int entryNumber, @JsonProperty("timestamp") String timestamp,
+                           @JsonProperty("itemHash") String itemHash) {
         super(timestamp, entryNumber);
         this.itemHash = itemHash;
     }
@@ -43,6 +42,4 @@ public class Entry extends AbstractEntry {
                 ", item=" + item +
                 '}';
     }
-
-
 }

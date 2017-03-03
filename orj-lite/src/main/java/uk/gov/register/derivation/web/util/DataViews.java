@@ -14,10 +14,10 @@ import static java.util.stream.Collectors.toMap;
 public class DataViews {
 
     public static Map<String, Map<String, Object>> recordsAsMap(Collection<PartialEntity> entities) {
-        return entities.stream().collect(toMap(e -> e.getKey(), e -> recordAsMap(e)));
+        return entities.stream().collect(toMap(PartialEntity::getKey, DataViews::recordAsMap));
     }
 
-    public static Map<String, Object> recordAsMap(PartialEntity entity) {
+    public static Map<String, Object> recordAsMap(PartialEntity<Entry> entity) {
         Map<String, Object> combinedItemEntryMap = new HashMap<>();
         Entry record = entity.getRecord().orElseThrow(IllegalStateException::new);
         combinedItemEntryMap.putAll(record.getItem().getFields());
@@ -33,7 +33,7 @@ public class DataViews {
         return map;
     }
 
-    public static List<Map<String,Object>> entriesAsArray(PartialEntity partialEntity) {
-        return partialEntity.getEntries().stream().map(e -> entryAsMap(e)).collect(toList());
+    public static List<Map<String,Object>> entriesAsArray(PartialEntity<Entry> partialEntity) {
+        return partialEntity.getEntries().stream().map(DataViews::entryAsMap).collect(toList());
     }
 }
