@@ -1,5 +1,4 @@
 rootProject.name = 'openregister-derivation'
 include 'derivation-core'
-include 'derivation-cli'
 include 'orj-lite'
 include 'derivation-local-authorities-by-type'
