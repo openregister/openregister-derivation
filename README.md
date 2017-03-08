@@ -31,20 +31,21 @@ For example:
 
 # Web Application
 
-This is a simplified version of the Register application.
+This is a simplified version of the Register application with derivation endpoints added.
 
 ### Building
 
 	cd [project root]
-    gradle orj-lite:shadowJar
+    gradle derivation-framework:shadowJar
     
 ### Running
 
-    cd orj-lite
-    java -jar build/libs/orj-lite-all.jar server orj-lite.yaml
+    cd derivation-framework
+    java -jar build/libs/derivation-framework-all.jar server orj-lite.yaml
     
 The application has no persistent data store. You need to load some register data into memory using:
 
+	cd [project root]/orj-lite
     ./load-local-authority-rsf.sh 
     
    

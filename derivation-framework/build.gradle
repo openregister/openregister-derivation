@@ -8,16 +8,22 @@ buildscript {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
+group 'openregister'
+
 apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
 
 jar {
     manifest {
-        attributes 'Main-Class': 'uk.gov.register.derivation.web.OrjLiteApplication'
+        attributes 'Main-Class': 'uk.gov.register.derivation.web.DerivationApplication'
     }
 }
 
 dependencies {
-    compile project(':derivation-core')
-    compile 'io.dropwizard:dropwizard-core:1.0.6'
+    compile project(':orj-lite')
+    compile project(':derivation-local-authorities-by-type')
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

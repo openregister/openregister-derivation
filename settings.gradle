@@ -2,5 +2,5 @@ rootProject.name = 'openregister-derivation'
 include 'derivation-core'
 include 'orj-lite'
 include 'derivation-local-authorities-by-type'
-include 'deriv-framework'
+include 'derivation-framework'
 
